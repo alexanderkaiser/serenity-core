@@ -1,7 +1,7 @@
 package net.serenitybdd.reports.json
 
 import net.serenitybdd.reports.configuration.*
-import net.thucydides.core.ThucydidesSystemProperty.*
+import net.thucydides.model.ThucydidesSystemProperty.*
 import java.nio.file.Path
 
 
@@ -19,7 +19,7 @@ sealed class JsonSummaryReport {
         private const val DEFAULT_TEMPLATE = "templates/json-summary.ftl"
         private const val DEFAULT_SCOREBOARD_SIZE= 5
 
-        fun outputDirectory() : ReportProperty<Path> = PathReportProperty(SERENITY_OUTPUT_DIRECTORY, DEFAULT_OUTPUT_DIRECTORY)
+        fun outputDirectory() : ReportProperty<Path> = ConfiguredOutputDirectoryProperty()
 
         fun reportTitle() : ReportProperty<String> = StringReportProperty(SERENITY_SUMMARY_REPORT_TITLE, DEFAULT_TITLE)
 

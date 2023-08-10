@@ -1,12 +1,11 @@
 package net.serenitybdd.core.webdriver.integration;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import net.serenitybdd.core.pages.ListOfWebElementFacades;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
-import net.thucydides.core.configuration.SystemPropertiesConfiguration;
-import net.thucydides.core.environment.MockEnvironmentVariables;
-import net.thucydides.core.webdriver.Configuration;
+import net.thucydides.model.configuration.SystemPropertiesConfiguration;
+import net.thucydides.model.environment.MockEnvironmentVariables;
+import net.thucydides.model.webdriver.Configuration;
 import net.thucydides.core.webdriver.shadow.ByShadow;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -51,7 +50,6 @@ public class WhenInteractingWithShadowDomElements {
 
     @BeforeClass
     public static void openDriver() {
-        WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1200");
         driver = new ChromeDriver(options);

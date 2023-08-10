@@ -1,21 +1,19 @@
 package net.serenitybdd.reports.model
 
-import net.thucydides.core.guice.Injectors.getInjector
-import net.thucydides.core.model.TestResult
-import net.thucydides.core.model.TestTag
-import net.thucydides.core.reports.TestOutcomes
-import net.thucydides.core.reports.html.ReportNameProvider
-import net.thucydides.core.reports.html.TagExclusions
-import net.thucydides.core.reports.html.TagFilter
-import net.thucydides.core.requirements.RequirementsService
-import net.thucydides.core.util.EnvironmentVariables
+import net.serenitybdd.model.di.ModelInfrastructure
+import net.thucydides.model.domain.TestResult
+import net.thucydides.model.domain.TestTag
+import net.thucydides.model.reports.TestOutcomes
+import net.thucydides.model.reports.html.ReportNameProvider
+import net.thucydides.model.reports.html.TagExclusions
+import net.thucydides.model.reports.html.TagFilter
 import org.apache.commons.lang3.StringUtils
 
 
 class TagResults(val testOutcomes: TestOutcomes) {
 
-    val requirementsService = getInjector().getInstance(RequirementsService::class.java)
-    val environmentVariables = getInjector().getInstance(EnvironmentVariables::class.java)
+    val requirementsService =  ModelInfrastructure.getRequirementsService()
+    val environmentVariables = ModelInfrastructure.getEnvironmentVariables()
     val tagFilter = TagFilter(environmentVariables)
     var ignoredValues: MutableList<String> = mutableListOf()
     var ignoredTypes: MutableList<String> = mutableListOf()
@@ -70,4 +68,4 @@ class TagResult(val tag: TestTag, val report: String, val count: Int, val result
     val color = BackgroundColor().inDarkforResult(result)
 }
 
-class TagResultSet(val tagType: String, val tagResults: List<TagResult>);
+class TagResultSet(val tagType: String, val tagResults: List<TagResult>)

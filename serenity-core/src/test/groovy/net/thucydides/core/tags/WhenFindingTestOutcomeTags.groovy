@@ -1,9 +1,9 @@
 package net.thucydides.core.tags
 
-import net.thucydides.core.model.TestOutcome
-import net.thucydides.core.model.TestTag
-import net.thucydides.core.statistics.service.FeatureStoryTagProvider
-import net.thucydides.core.environment.MockEnvironmentVariables
+import net.thucydides.model.domain.TestOutcome
+import net.thucydides.model.domain.TestTag
+import net.thucydides.model.statistics.service.FeatureStoryTagProvider
+import net.thucydides.model.environment.MockEnvironmentVariables
 import spock.lang.Specification
 
 /**
@@ -27,7 +27,7 @@ class WhenFindingTestOutcomeTags extends Specification {
         when:
             def tags = tagProvider.getTagsFor(testOutcome)
         then:
-            tags.contains(TestTag.withName("When finding test outcome tags/Some test").andType("story"))
+            tags.contains(TestTag.withName("net/thucydides/core/tags/WhenFindingTestOutcomeTags/SomeTest").andType("feature"))
     }
 
     def "should not get story tag from the test class if "() {

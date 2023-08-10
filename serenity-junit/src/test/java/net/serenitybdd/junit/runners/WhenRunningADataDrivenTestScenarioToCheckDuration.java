@@ -1,13 +1,13 @@
 package net.serenitybdd.junit.runners;
 
-import net.thucydides.core.batches.BatchManager;
-import net.thucydides.core.batches.BatchManagerProvider;
-import net.thucydides.core.configuration.SystemPropertiesConfiguration;
+import net.serenitybdd.core.di.SerenityInfrastructure;
+import net.thucydides.model.batches.BatchManager;
+import net.thucydides.model.configuration.SystemPropertiesConfiguration;
 import net.thucydides.core.configuration.WebDriverConfiguration;
-import net.thucydides.core.model.TestOutcome;
-import net.thucydides.core.model.TestStep;
-import net.thucydides.core.environment.MockEnvironmentVariables;
-import net.thucydides.core.webdriver.Configuration;
+import net.thucydides.model.domain.TestOutcome;
+import net.thucydides.model.domain.TestStep;
+import net.thucydides.model.environment.MockEnvironmentVariables;
+import net.thucydides.model.webdriver.Configuration;
 import net.thucydides.core.webdriver.DriverConfiguration;
 import net.thucydides.core.webdriver.WebDriverFactory;
 import net.thucydides.junit.rules.QuietThucydidesLoggingRule;
@@ -52,7 +52,7 @@ public class WhenRunningADataDrivenTestScenarioToCheckDuration {
     protected SerenityParameterizedRunner getStubbedTestRunnerUsing(Class<?> testClass) throws Throwable {
         DriverConfiguration configuration = new WebDriverConfiguration(environmentVariables);
         WebDriverFactory factory = new WebDriverFactory(environmentVariables);
-        BatchManager batchManager = new BatchManagerProvider(configuration).get();
+        BatchManager batchManager = SerenityInfrastructure.getBatchManager();
         return new SerenityParameterizedRunner(testClass, configuration, factory, batchManager);
     }
 

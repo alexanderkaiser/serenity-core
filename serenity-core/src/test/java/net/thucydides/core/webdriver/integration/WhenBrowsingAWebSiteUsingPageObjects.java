@@ -1,13 +1,12 @@
 package net.thucydides.core.webdriver.integration;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.PageUrls;
-import net.thucydides.core.configuration.SystemPropertiesConfiguration;
+import net.thucydides.model.configuration.SystemPropertiesConfiguration;
 import net.thucydides.core.pages.WebElementFacade;
 import net.thucydides.core.pages.WebElementFacadeImpl;
-import net.thucydides.core.environment.MockEnvironmentVariables;
-import net.thucydides.core.webdriver.Configuration;
+import net.thucydides.model.environment.MockEnvironmentVariables;
+import net.thucydides.model.webdriver.Configuration;
 import net.thucydides.core.webelements.RadioButtonGroup;
 import org.junit.After;
 import org.junit.Before;
@@ -95,7 +94,6 @@ public class WhenBrowsingAWebSiteUsingPageObjects {
 
     @Before
     public void openLocalStaticSite() {
-        WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1200");
         driver = new ChromeDriver(options);

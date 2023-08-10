@@ -1,7 +1,8 @@
 package net.thucydides.core.configuration;
 
-import com.google.inject.Inject;
-import net.thucydides.core.util.EnvironmentVariables;
+
+import net.thucydides.model.configuration.SystemPropertiesConfiguration;
+import net.thucydides.model.util.EnvironmentVariables;
 import net.thucydides.core.webdriver.*;
 
 import java.util.Optional;
@@ -14,7 +15,7 @@ public class WebDriverConfiguration<T extends DriverConfiguration> extends Syste
     public static final String DEFAULT_WEBDRIVER_DRIVER = "chrome";
 
 
-    @Inject
+    
     public WebDriverConfiguration(EnvironmentVariables environmentVariables) {
         super(environmentVariables);
 

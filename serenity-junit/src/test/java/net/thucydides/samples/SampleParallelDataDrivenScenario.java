@@ -1,12 +1,12 @@
 package net.thucydides.samples;
 
-import net.thucydides.core.annotations.Managed;
-import net.thucydides.core.annotations.ManagedPages;
-import net.thucydides.core.annotations.Steps;
+import net.serenitybdd.annotations.Managed;
+import net.serenitybdd.annotations.ManagedPages;
+import net.serenitybdd.annotations.Steps;
 import net.thucydides.core.pages.Pages;
 import net.thucydides.junit.annotations.Concurrent;
 import net.thucydides.junit.annotations.TestData;
-import net.thucydides.junit.runners.ThucydidesParameterizedRunner;
+import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
@@ -14,7 +14,7 @@ import org.openqa.selenium.WebDriver;
 import java.util.Arrays;
 import java.util.Collection;
 
-@RunWith(ThucydidesParameterizedRunner.class)
+@RunWith(SerenityParameterizedRunner.class)
 @Concurrent
 public class SampleParallelDataDrivenScenario {
 

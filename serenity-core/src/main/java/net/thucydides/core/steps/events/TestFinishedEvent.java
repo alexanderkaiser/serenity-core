@@ -4,6 +4,7 @@ import net.serenitybdd.core.webdriver.RemoteDriver;
 import net.thucydides.core.steps.session.TestSession;
 import net.thucydides.core.webdriver.SerenityWebdriverManager;
 import net.thucydides.core.webdriver.ThucydidesWebDriverSupport;
+import net.thucydides.core.webdriver.WebDriverFacade;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.SessionId;
 
@@ -14,8 +15,6 @@ public class TestFinishedEvent extends StepEventBusEventBase {
 
 	private boolean inDataTest;
 
-	private final ZonedDateTime finishingTime;
-
 	private SessionId webSessionId;
 
 	private String driverUsedInThisTest;
@@ -23,21 +22,19 @@ public class TestFinishedEvent extends StepEventBusEventBase {
 	private WebDriver webDriver;
 
 	public TestFinishedEvent() {
-		this.finishingTime = ZonedDateTime.now();
 		saveCurrentWebDriverContext();
 	}
 
-	public TestFinishedEvent(String scenarioId,boolean inDataDrivenTest) {
+	public TestFinishedEvent(String scenarioId, boolean inDataDrivenTest) {
 		super(scenarioId);
 		this.inDataTest = inDataDrivenTest;
-		this.finishingTime = ZonedDateTime.now();
 		saveCurrentWebDriverContext();
 	}
 
 
 	private void saveCurrentWebDriverContext() {
-		WebDriver currentDriver = SerenityWebdriverManager.inThisTestThread().getCurrentDriver();
-		if (currentDriver != null) {
+		WebDriverFacade currentDriver = (WebDriverFacade) SerenityWebdriverManager.inThisTestThread().getCurrentDriver();
+		if (currentDriver != null && currentDriver.isInstantiated()) {
 			SessionId sessionId = RemoteDriver.of(currentDriver).getSessionId();
 			setWebSessionId(sessionId);
 			setWebDriver(currentDriver);
@@ -58,9 +55,9 @@ public class TestFinishedEvent extends StepEventBusEventBase {
 			TestSession.getTestSessionContext().setDriverUsedInThisTest(getDriverUsedInThisTest());
 		}
 		if (getScenarioId() != null) {
-			getStepEventBus().testFinished(inDataTest, finishingTime);
+			getStepEventBus().testFinished(inDataTest, getTimestamp());
 		} else {
-			getStepEventBus().testFinished();
+			getStepEventBus().testFinished(false, getTimestamp());
 		}
 	}
 

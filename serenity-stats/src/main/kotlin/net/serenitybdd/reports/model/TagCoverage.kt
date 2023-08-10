@@ -1,16 +1,16 @@
 package net.serenitybdd.reports.model
 
-import net.serenitybdd.core.environment.EnvironmentSpecificConfiguration
-import net.thucydides.core.ThucydidesSystemProperty.SERENITY_REPORT_HIDE_EMPTY_REQUIREMENTS
-import net.thucydides.core.guice.Injectors
-import net.thucydides.core.model.TestResult
-import net.thucydides.core.model.TestResult.*
-import net.thucydides.core.model.TestTag
-import net.thucydides.core.reports.TestOutcomes
-import net.thucydides.core.reports.html.ReportNameProvider
-import net.thucydides.core.reports.html.ResultIconFormatter
-import net.thucydides.core.util.EnvironmentVariables
-import net.thucydides.core.util.NameConverter.humanize
+import net.serenitybdd.model.di.ModelInfrastructure
+import net.serenitybdd.model.environment.EnvironmentSpecificConfiguration
+import net.thucydides.model.ThucydidesSystemProperty.SERENITY_REPORT_HIDE_EMPTY_REQUIREMENTS
+import net.thucydides.model.domain.TestResult
+import net.thucydides.model.domain.TestResult.*
+import net.thucydides.model.domain.TestTag
+import net.thucydides.model.reports.TestOutcomes
+import net.thucydides.model.reports.html.ReportNameProvider
+import net.thucydides.model.reports.html.ResultIconFormatter
+import net.thucydides.model.util.EnvironmentVariables
+import net.thucydides.model.util.NameConverter.humanize
 import org.apache.commons.lang3.StringUtils
 import java.util.*
 
@@ -20,7 +20,7 @@ class TagCoverage(val environmentVariables: EnvironmentVariables, val testOutcom
     companion object {
         @JvmStatic
         fun from(testOutcomes: TestOutcomes) =
-            TagCoverageBuilder(testOutcomes, Injectors.getInjector().getInstance(EnvironmentVariables::class.java))
+            TagCoverageBuilder(testOutcomes, ModelInfrastructure.getEnvironmentVariables())
     }
 }
 
@@ -36,7 +36,7 @@ class TagCoverageBuilder(
         environmentVariables
     )
 
-    var hideEmptyRequirements: Boolean = false;
+    var hideEmptyRequirements: Boolean = false
 
     init {
         hideEmptyRequirements = EnvironmentSpecificConfiguration.from(environmentVariables)
@@ -59,7 +59,7 @@ class TagCoverageBuilder(
                 )
             }
         }
-        return coveragesByTagType;
+        return coveragesByTagType
     }
 
     private fun shouldShow(testOutcomes: TestOutcomes): Boolean {
@@ -148,13 +148,14 @@ class CoverageByTagType(
         val successRate = testOutcomesForTag.formattedPercentage.withResult(SUCCESS, 0)
 
         return CoverageByTag(
-            humanize(shortened(testTag.name)),
+            humanize(shortened(testTag.displayName)),
             humanize(parent(testTag.name)),
+//            humanize(""),
             testOutcomesForTag.scenarioCount,
             testOutcomesForTag.testCaseCount,
             successRate,
             testOutcomesForTag.result,
-            ReportNameProvider().forTag(testTag),
+            ReportNameProvider().forRequirementOrTag(testTag),
             countByResultLabelFrom(testOutcomesForTag),
             percentageByResultFrom(testOutcomesForTag)
         )
@@ -162,6 +163,16 @@ class CoverageByTagType(
 
     private fun shortened(name: String): String = name.substringAfterLast("/")
     private fun parent(name: String): String = name.substringBeforeLast("/")
+//    private fun parent(name: String): String = secondLastElement(name)
+
+    private fun secondLastElement(s: String): String {
+        val parts = s.split("/")
+        return if (parts.size > 1) {
+            parts[parts.size - 2]
+        } else {
+            ""
+        }
+    }
 }
 
 class CoverageByTag(
@@ -194,6 +205,6 @@ class CoverageByTag(
 
 class CoverageSegment(val percentage: Double, val count: Long, val result: TestResult) {
     val color = BackgroundColor().inDarkforResult(result)
-    val roundedPercentage = Math.round(percentage);
+    val roundedPercentage = Math.round(percentage)
     val title = "${roundedPercentage}% ${result.toString().lowercase()}"
 }

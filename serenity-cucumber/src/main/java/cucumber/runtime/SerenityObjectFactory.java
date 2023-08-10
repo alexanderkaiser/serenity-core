@@ -8,7 +8,7 @@ import io.cucumber.core.plugin.ConfigureDriverFromTags;
 import net.serenitybdd.core.Serenity;
 import net.serenitybdd.core.annotations.events.BeforeScenario;
 import net.serenitybdd.core.lifecycle.LifecycleRegister;
-import net.thucydides.core.model.TestOutcome;
+import net.thucydides.model.domain.TestOutcome;
 import net.thucydides.core.pages.Pages;
 import net.thucydides.core.steps.StepEventBus;
 import net.thucydides.core.webdriver.ThucydidesWebDriverSupport;
@@ -35,7 +35,6 @@ public class SerenityObjectFactory implements ObjectFactory {
         Serenity.done(false);
     }
 
-
     @Override
     public boolean addClass(Class<?> glueClass) {
         classes.add(glueClass);
@@ -43,7 +42,6 @@ public class SerenityObjectFactory implements ObjectFactory {
     }
 
     public <T> T getInstance(Class<T> type) {
-        ConfigureDriverFromTags.inTheCurrentTestOutcome();
         T instance = type.cast(instances.get(type));
         if (instance == null) {
             instance = cacheNewInstance(type);

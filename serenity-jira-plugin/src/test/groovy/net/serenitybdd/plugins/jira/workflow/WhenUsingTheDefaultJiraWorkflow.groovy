@@ -1,9 +1,9 @@
 package net.serenitybdd.plugins.jira.workflow
 
-import net.serenitybdd.plugins.jira.guice.Injectors
+import net.serenitybdd.model.di.ModelInfrastructure
 import spock.lang.Specification
 
-import static net.thucydides.core.model.TestResult.*
+import static net.thucydides.model.domain.TestResult.*
 
 class WhenUsingTheDefaultJiraWorkflow extends Specification {
 
@@ -18,7 +18,9 @@ class WhenUsingTheDefaultJiraWorkflow extends Specification {
     }
 
     def setup() {
-        workflow = Injectors.getInjector().getInstance(WorkflowLoader).load()
+        def environmentVariables = ModelInfrastructure.environmentVariables
+        workflow = new ClasspathWorkflowLoader("jira-workflow.groovy", environmentVariables).load()
+
     }
 
 

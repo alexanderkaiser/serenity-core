@@ -1,25 +1,30 @@
 package net.serenitybdd.core;
 
-import net.serenitybdd.core.collect.NewList;
+import net.serenitybdd.model.IgnoredStepException;
+import net.serenitybdd.model.PendingStepException;
+import net.serenitybdd.model.collect.NewList;
 import net.serenitybdd.core.configurers.WebDriverConfigurer;
-import net.serenitybdd.core.di.DependencyInjector;
-import net.serenitybdd.core.di.WebDriverInjectors;
-import net.serenitybdd.core.environment.ConfiguredEnvironment;
+import net.serenitybdd.model.di.DependencyInjector;
+import net.serenitybdd.core.di.SerenityInfrastructure;
+import net.serenitybdd.model.environment.ConfiguredEnvironment;
 import net.serenitybdd.core.injectors.EnvironmentDependencyInjector;
 import net.serenitybdd.core.lifecycle.LifecycleRegister;
 import net.serenitybdd.core.reports.ReportDataSaver;
 import net.serenitybdd.core.reports.WithTitle;
 import net.serenitybdd.core.sessions.TestSessionVariables;
 import net.thucydides.core.annotations.TestCaseAnnotations;
-import net.thucydides.core.environment.SystemEnvironmentVariables;
-import net.thucydides.core.guice.Injectors;
+import net.thucydides.model.environment.SystemEnvironmentVariables;
 import net.thucydides.core.pages.Pages;
-import net.thucydides.core.screenshots.ScreenshotAndHtmlSource;
+import net.thucydides.model.screenshots.ScreenshotAndHtmlSource;
 import net.thucydides.core.steps.*;
-import net.thucydides.core.steps.di.DependencyInjectorService;
+import net.thucydides.model.steps.ExecutedStepDescription;
+import net.thucydides.model.steps.StepFailure;
+import net.thucydides.model.steps.StepListener;
+import net.thucydides.model.steps.di.DependencyInjectorService;
 import net.thucydides.core.steps.session.TestSession;
-import net.thucydides.core.util.EnvironmentVariables;
+import net.thucydides.model.util.EnvironmentVariables;
 import net.thucydides.core.webdriver.*;
+import net.thucydides.model.webdriver.Configuration;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 
@@ -37,7 +42,6 @@ import static net.serenitybdd.core.webdriver.configuration.RestartBrowserForEach
  */
 public class Serenity {
 
-    private static final ThreadLocal<WebDriverFactory> factoryThreadLocal = new ThreadLocal<>();
     private static final ThreadLocal<StepListener> stepListenerThreadLocal = new ThreadLocal<>();
     private static final ThreadLocal<TestSessionVariables> testSessionThreadLocal = ThreadLocal.withInitial(TestSessionVariables::new);
     private static final ThreadLocal<FirefoxProfile> firefoxProfileThreadLocal = new ThreadLocal<>();
@@ -51,7 +55,6 @@ public class Serenity {
     public static void initialize(final Object testCase) {
         ThucydidesWebDriverSupport.initialize();
 
-        setupWebDriverFactory();
         setupWebdriverManager();
 
         ThucydidesWebDriverSupport.initializeFieldsIn(testCase);
@@ -85,7 +88,8 @@ public class Serenity {
     }
 
     private static DependencyInjectorService getDependencyInjectorService() {
-        return Injectors.getInjector().getInstance(DependencyInjectorService.class);
+        return SerenityInfrastructure.getDependencyInjectorService();
+//        return Injectors.getInjector().getInstance(DependencyInjectorService.class);
     }
 
     private static List<DependencyInjector> getDefaultDependencyInjectors() {
@@ -101,7 +105,6 @@ public class Serenity {
      * @param testCase any object (testcase or other) containing injectable Serenity components
      */
     public static SerenityConfigurer initializeWithNoStepListener(final Object testCase) {
-        setupWebDriverFactory();
         setupWebdriverManager();
 
         ThucydidesWebDriverSupport.initialize();
@@ -122,10 +125,6 @@ public class Serenity {
         StepListener listener = new BaseStepListener(outputDirectory);
         stepListenerThreadLocal.set(listener);
         getStepEventBus().registerListener(getStepListener());
-    }
-
-    private static void setupWebDriverFactory() {
-        factoryThreadLocal.set(WebDriverInjectors.getInjector().getInstance(WebDriverFactory.class));
     }
 
     /**

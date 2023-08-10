@@ -2,6 +2,7 @@ package net.serenitybdd.core.di;
 
 import java.lang.annotation.Annotation;
 
+import net.serenitybdd.model.di.DependencyInjector;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextHierarchy;
@@ -11,7 +12,6 @@ public class SpringDependencyInjector implements DependencyInjector {
 
     /**
      * Setup Spring dependencies in a step library, based on the Spring ContextConfiguration annotation.
-     * @param target
      */
     public void injectDependenciesInto(Object target) {
         if (springIsOnClasspath() && (annotatedWithSpringContext(target) || annotatedWithSpringBootTest(target))) {

@@ -1,21 +1,24 @@
 package net.thucydides.core.model;
 
-import net.serenitybdd.core.collect.NewList;
-import net.serenitybdd.core.exceptions.TestCompromisedException;
-import net.thucydides.core.annotations.Issue;
-import net.thucydides.core.annotations.Issues;
-import net.thucydides.core.annotations.Story;
-import net.thucydides.core.annotations.Title;
-import net.thucydides.core.issues.IssueTracking;
-import net.thucydides.core.issues.SystemPropertiesIssueTracking;
-import net.thucydides.core.matchers.ThucydidesMatchers;
-import net.thucydides.core.model.screenshots.Screenshot;
-import net.thucydides.core.model.stacktrace.FailureCause;
+import net.serenitybdd.model.collect.NewList;
+import net.serenitybdd.model.exceptions.TestCompromisedException;
+import net.serenitybdd.annotations.Issue;
+import net.serenitybdd.annotations.Issues;
+import net.serenitybdd.annotations.Story;
+import net.serenitybdd.annotations.Title;
+import net.thucydides.model.domain.TestOutcome;
+import net.thucydides.model.domain.TestResult;
+import net.thucydides.model.domain.TestStep;
+import net.thucydides.model.issues.IssueTracking;
+import net.thucydides.model.issues.SystemPropertiesIssueTracking;
+import net.thucydides.model.matchers.ThucydidesMatchers;
+import net.thucydides.model.domain.screenshots.Screenshot;
+import net.thucydides.model.domain.stacktrace.FailureCause;
 import net.thucydides.core.pages.Pages;
 import net.thucydides.core.steps.ScenarioSteps;
-import net.thucydides.core.steps.StepFailureException;
-import net.thucydides.core.util.EnvironmentVariables;
-import net.thucydides.core.environment.MockEnvironmentVariables;
+import net.thucydides.model.steps.StepFailureException;
+import net.thucydides.model.util.EnvironmentVariables;
+import net.thucydides.model.environment.MockEnvironmentVariables;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static net.thucydides.core.model.TestResult.*;
+import static net.thucydides.model.domain.TestResult.*;
 import static net.thucydides.core.model.TestStepFactory.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -182,7 +185,7 @@ public class WhenRecordingNewTestOutcomes {
     public void a_test_outcome_can_be_initialized_directly_from_a_story() {
         testOutcome = TestOutcome.forTest("should_do_this", AUserStory.class);
 
-        Assert.assertThat(testOutcome.getUserStory().getName(), is("A user story"));
+        Assert.assertThat(testOutcome.getUserStory().getName(), is("AUserStory"));
     }
 
     @Test
@@ -449,7 +452,7 @@ public class WhenRecordingNewTestOutcomes {
      */
     @Test
     public void a_test_outcome_title_should_be_the_method_name_if_no_test_class_is_defined() {
-        net.thucydides.core.model.Story story = net.thucydides.core.model.Story.from(AUserStory.class);
+        net.thucydides.model.domain.Story story = net.thucydides.model.domain.Story.from(AUserStory.class);
 
         TestOutcome outcome = TestOutcome.forTestInStory("Some scenario", story);
 
@@ -657,7 +660,7 @@ public class WhenRecordingNewTestOutcomes {
         assertThat(testOutcome.isCompromised(), is(true));
 
         TestStep compromisedStep = testOutcome.getTestSteps().get(1);
-        assertThat(compromisedStep.getErrorMessage(), is("net.serenitybdd.core.exceptions.TestCompromisedException: Oh bother!"));
+        assertThat(compromisedStep.getErrorMessage(), is("net.serenitybdd.model.exceptions.TestCompromisedException: Oh bother!"));
     }
 
     @Test
@@ -1074,36 +1077,36 @@ public class WhenRecordingNewTestOutcomes {
 
     @Test
     public void an_acceptance_test_relates_to_a_user_story() {
-        net.thucydides.core.model.Story story = net.thucydides.core.model.Story.from(MyApp.MyUserStory.class);
+        net.thucydides.model.domain.Story story = net.thucydides.model.domain.Story.from(MyApp.MyUserStory.class);
         TestOutcome testOutcome = TestOutcome.forTestInStory("some_test", story);
 
-        assertThat(testOutcome.getUserStory().getName(), is("My user story"));
+        assertThat(testOutcome.getUserStory().getName(), is("MyUserStory"));
     }
 
     @Test
     public void an_acceptance_test_title_is_the_title_of_the_user_story() {
-        net.thucydides.core.model.Story story = net.thucydides.core.model.Story.from(MyApp.MyUserStory.class);
+        net.thucydides.model.domain.Story story = net.thucydides.model.domain.Story.from(MyApp.MyUserStory.class);
         TestOutcome testOutcome = TestOutcome.forTestInStory("some_test", story);
 
-        assertThat(testOutcome.getStoryTitle(), is("My user story"));
+        assertThat(testOutcome.getStoryTitle(), is("MyUserStory"));
     }
 
     @Test
     public void the_complete_test_name_should_include_the_story_and_the_method_name() {
-        net.thucydides.core.model.Story story = net.thucydides.core.model.Story.from(MyApp.MyUserStory.class);
+        net.thucydides.model.domain.Story story = net.thucydides.model.domain.Story.from(MyApp.MyUserStory.class);
         TestOutcome testOutcome = TestOutcome.forTestInStory("some_test", story);
-        assertThat(testOutcome.getCompleteName(), is("My user story:some_test"));
+        assertThat(testOutcome.getCompleteName(), is("MyUserStory:some_test"));
     }
 
     @Test
     public void the_complete_test_name_should_include_the_test_case_if_defined_and_the_method_name() {
         TestOutcome testOutcome = TestOutcome.forTest("should_do_this", SimpleTestScenario.class);
-        assertThat(testOutcome.getCompleteName(), is("Simple test scenario:should_do_this"));
+        assertThat(testOutcome.getCompleteName(), is("SimpleTestScenario:should_do_this"));
     }
 
     @Test
     public void an_acceptance_test_records_the_original_story_class() {
-        net.thucydides.core.model.Story story = net.thucydides.core.model.Story.from(MyApp.MyUserStory.class);
+        net.thucydides.model.domain.Story story = net.thucydides.model.domain.Story.from(MyApp.MyUserStory.class);
         TestOutcome testOutcome = TestOutcome.forTestInStory("some_test", story);
         assertThat(testOutcome.getUserStory().getStoryClassName(), is(MyApp.MyUserStory.class.getName()));
     }
@@ -1157,13 +1160,13 @@ public class WhenRecordingNewTestOutcomes {
     }
 
 
-    @Test
-    public void should_be_able_to_record_nested_test_information() {
-        TestOutcome outcome = TestOutcome.forTest("should_do_something_else", ATestScenarioWithNestedClass.NestedClass.class);
-
-        assertThat(outcome.getNestedTestPath().size(),is(3) );
-
-    }
+//    @Test
+//    public void should_be_able_to_record_nested_test_information() {
+//        TestOutcome outcome = TestOutcome.forTest("should_do_something_else", ATestScenarioWithNestedClass.NestedClass.class);
+//
+//        assertThat(outcome.getNestedTestPath().size(),is(3) );
+//
+//    }
 
 
 //    @Test

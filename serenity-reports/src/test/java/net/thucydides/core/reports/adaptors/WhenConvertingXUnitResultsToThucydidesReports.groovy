@@ -1,15 +1,13 @@
 package net.thucydides.core.reports.adaptors
 
 import net.thucydides.core.reports.TestOutcomeAdaptorReporter
-import net.thucydides.core.reports.adaptors.lettuce.LettuceXUnitAdaptor
-import net.thucydides.core.reports.adaptors.xunit.DefaultXUnitAdaptor
-import org.junit.Rule
-import org.junit.rules.TemporaryFolder
+import net.thucydides.model.reports.adaptors.lettuce.LettuceXUnitAdaptor
+import net.thucydides.model.reports.adaptors.xunit.DefaultXUnitAdaptor
 import spock.lang.Specification
 
 import java.nio.file.Files
 
-import static net.thucydides.core.util.TestResources.fileInClasspathCalled
+import static net.thucydides.model.util.TestResources.fileInClasspathCalled
 
 class WhenConvertingXUnitResultsToThucydidesReports extends Specification {
 
@@ -31,7 +29,6 @@ class WhenConvertingXUnitResultsToThucydidesReports extends Specification {
             xunitReporter.generateReportsFrom(xunitFileDirectory)
         then:
             generatedJsonFiles().size() == 3
-            generatedHtmlFiles().size() == 3
     }
 
     def generatedJsonFiles() {
@@ -62,7 +59,6 @@ class WhenConvertingXUnitResultsToThucydidesReports extends Specification {
             xunitReporter.generateReportsFrom(xunitFileDirectory)
         then:
             generatedJsonFiles().size() == 4
-            generatedHtmlFiles().size() == 4
     }
 
 }

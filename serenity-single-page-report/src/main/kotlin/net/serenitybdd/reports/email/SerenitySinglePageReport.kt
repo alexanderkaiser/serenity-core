@@ -2,7 +2,7 @@ package net.serenitybdd.reports.email
 
 import net.serenitybdd.reports.configuration.*
 import net.serenitybdd.reports.model.ReportTags
-import net.thucydides.core.ThucydidesSystemProperty.*
+import net.thucydides.model.ThucydidesSystemProperty.*
 import java.io.File
 import java.nio.file.Path
 
@@ -23,8 +23,7 @@ sealed class SerenitySinglePageReport {
         private const val DEFAULT_SCOREBOARD_SIZE = 5
         const val DEFAULT_TEMPLATE_DIRECTORY = "templates/email"
 
-        fun outputDirectory(): ReportProperty<Path> = PathReportProperty(SERENITY_OUTPUT_DIRECTORY, DEFAULT_OUTPUT_DIRECTORY)
-        fun sourceDirectory(): ReportProperty<Path> = PathReportProperty(SERENITY_OUTPUT_DIRECTORY, DEFAULT_OUTPUT_DIRECTORY)
+        fun outputDirectory(): ReportProperty<Path> = ConfiguredOutputDirectoryProperty()
 
         fun reportTitle(): ReportProperty<String> = StringReportProperty(SERENITY_SUMMARY_REPORT_TITLE, DEFAULT_TITLE)
 

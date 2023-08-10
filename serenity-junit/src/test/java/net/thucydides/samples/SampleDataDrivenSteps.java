@@ -1,16 +1,16 @@
 package net.thucydides.samples;
 
-import net.thucydides.core.annotations.Step;
-import net.thucydides.core.annotations.StepGroup;
+import net.serenitybdd.annotations.Step;
+import net.serenitybdd.annotations.StepGroup;
 import net.thucydides.core.pages.Pages;
 import net.thucydides.core.steps.ScenarioSteps;
-import net.thucydides.junit.runners.ThucydidesRunner;
+import net.serenitybdd.junit.runners.SerenityRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SampleDataDrivenSteps extends ScenarioSteps {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ThucydidesRunner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SerenityRunner.class);
 
     public SampleDataDrivenSteps(Pages pages) {
         super(pages);

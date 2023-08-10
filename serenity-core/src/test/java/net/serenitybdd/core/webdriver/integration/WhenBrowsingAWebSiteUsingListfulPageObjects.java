@@ -1,14 +1,13 @@
 package net.serenitybdd.core.webdriver.integration;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import net.serenitybdd.core.annotations.ImplementedBy;
 import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
 import net.serenitybdd.core.pages.WebElementFacadeImpl;
-import net.thucydides.core.configuration.SystemPropertiesConfiguration;
-import net.thucydides.core.environment.MockEnvironmentVariables;
-import net.thucydides.core.webdriver.Configuration;
+import net.thucydides.model.configuration.SystemPropertiesConfiguration;
+import net.thucydides.model.environment.MockEnvironmentVariables;
+import net.thucydides.model.webdriver.Configuration;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -119,11 +118,6 @@ public class WhenBrowsingAWebSiteUsingListfulPageObjects {
     MockEnvironmentVariables environmentVariables;
 
     Configuration configuration;
-
-    @BeforeClass
-	public static void setupWebDriver() {
-		WebDriverManager.chromedriver().setup();
-	}
 
     @Before
     public void openLocalStaticSite() {

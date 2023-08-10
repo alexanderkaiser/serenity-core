@@ -1,6 +1,12 @@
 package net.thucydides.core.model
 
 import com.google.common.collect.Lists
+import net.thucydides.model.domain.Story
+import net.thucydides.model.domain.TestOutcome
+import net.thucydides.model.domain.TestResult
+import net.thucydides.model.domain.TestStep
+import net.thucydides.model.domain.TestTag
+
 /**
  * Created by john on 23/07/2016.
  */
@@ -84,20 +90,20 @@ class SampleTestResults {
         TestOutcome testOutcome10 = TestOutcome.forTestInStory("Feed chickens figs", Story.called("Feed chickens"))
         testOutcome10.recordStep(TestStep.forStepCalled("step 10").withResult(TestResult.SUCCESS))
         testOutcome10.addTags(Lists.asList(TestTag.withName("Raise chickens").andType("capability")));
-        testOutcome6.addVersion("Release 3");
-        testOutcome6.addVersion("Iteration 3.2");
+        testOutcome10.addVersion("Release 3");
+        testOutcome10.addVersion("Iteration 3.2");
 
         TestOutcome testOutcome11 = TestOutcome.forTestInStory("Feed chickens grain again", Story.called("Feed chickens"))
-        testOutcome10.recordStep(TestStep.forStepCalled("step 11").withResult(TestResult.SUCCESS))
-        testOutcome10.addTags(Lists.asList(TestTag.withName("Raise chickens").andType("capability")));
-        testOutcome6.addVersion("Release 3");
-        testOutcome6.addVersion("Iteration 3.2");
+        testOutcome11.recordStep(TestStep.forStepCalled("step 11").withResult(TestResult.SUCCESS))
+        testOutcome11.addTags(Lists.asList(TestTag.withName("Raise chickens").andType("capability")));
+        testOutcome11.addVersion("Release 3");
+        testOutcome11.addVersion("Iteration 3.2");
 
         TestOutcome testOutcome12 = TestOutcome.forTestInStory("Feed chickens grain yet again", Story.called("Feed chickens"))
-        testOutcome10.recordStep(TestStep.forStepCalled("step 12").withResult(TestResult.SUCCESS))
-        testOutcome10.addTags(Lists.asList(TestTag.withName("Raise chickens").andType("capability")));
-        testOutcome6.addVersion("Release 3");
-        testOutcome6.addVersion("Iteration 3.2");
+        testOutcome12.recordStep(TestStep.forStepCalled("step 12").withResult(TestResult.SUCCESS))
+        testOutcome12.addTags(Lists.asList(TestTag.withName("Raise chickens").andType("capability")));
+        testOutcome12.addVersion("Release 3");
+        testOutcome12.addVersion("Iteration 3.2");
 
         return [testOutcome1, testOutcome2, testOutcome3, testOutcome4, testOutcome5, testOutcome6, testOutcome7,
                 testOutcome8, testOutcome9, testOutcome10, testOutcome11, testOutcome12]
@@ -114,7 +120,6 @@ class SampleTestResults {
         testOutcome2.recordStep(TestStep.forStepCalled("step 1.1").withResult(TestResult.FAILURE))
         testOutcome2.addTags(Lists.asList(TestTag.withName("Apples").andType("feature")));
         testOutcome2.addTags(Lists.asList(TestTag.withName("Picking apples").andType("story")));
-
 
         return [testOutcome1, testOutcome2]
     }

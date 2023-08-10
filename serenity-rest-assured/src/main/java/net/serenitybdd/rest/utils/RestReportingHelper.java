@@ -7,20 +7,23 @@ import io.restassured.internal.support.Prettifier;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseOptions;
 import net.serenitybdd.core.Serenity;
-import net.serenitybdd.core.rest.RestMethod;
-import net.serenitybdd.core.rest.RestQuery;
+import net.serenitybdd.model.rest.RestMethod;
+import net.serenitybdd.model.rest.RestQuery;
 import net.serenitybdd.rest.RestStepListener;
 import net.serenitybdd.rest.decorators.request.RequestSpecificationDecorated;
 import net.serenitybdd.rest.event.RecordRestQueryEvent;
 import net.serenitybdd.rest.filters.FieldsRecordingFilter;
-import net.thucydides.core.steps.ExecutedStepDescription;
-import net.thucydides.core.steps.StepFailure;
+import net.thucydides.model.domain.TestResult;
+import net.thucydides.model.screenshots.ScreenshotAndHtmlSource;
+import net.thucydides.model.steps.ExecutedStepDescription;
+import net.thucydides.model.steps.StepFailure;
 import net.thucydides.core.steps.events.StepFailedEvent;
 import net.thucydides.core.steps.events.StepStartedEvent;
 import net.thucydides.core.steps.session.TestSession;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -99,7 +102,8 @@ public class RestReportingHelper {
         if (TestSession.isSessionStarted()) {
             TestSession.addEvent(new StepStartedEvent(description));
             TestSession.addEvent(new RecordRestQueryEvent(restQuery));
-            TestSession.addEvent(new StepFailedEvent(failure));
+             List<ScreenshotAndHtmlSource> screenshotList = TestSession.getTestSessionContext().getStepEventBus().takeScreenshots(TestResult.FAILURE);
+            TestSession.addEvent(new StepFailedEvent(failure,screenshotList));
         } else {
             getEventBus().stepStarted(description);
             getEventBus().getBaseStepListener().recordRestQuery(restQuery);

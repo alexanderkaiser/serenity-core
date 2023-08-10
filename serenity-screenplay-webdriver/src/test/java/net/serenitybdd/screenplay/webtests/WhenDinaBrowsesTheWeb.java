@@ -1,6 +1,5 @@
 package net.serenitybdd.screenplay.webtests;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import net.serenitybdd.junit.runners.SerenityRunner;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Question;
@@ -21,9 +20,8 @@ import net.serenitybdd.screenplay.webtests.questions.BankBalanceQuestion;
 import net.serenitybdd.screenplay.webtests.questions.ProfileQuestion;
 import net.serenitybdd.screenplay.webtests.questions.TheValidationMessages;
 import net.serenitybdd.screenplay.webtests.tasks.*;
-import net.thucydides.core.annotations.Managed;
-import net.thucydides.core.annotations.Steps;
-import org.junit.BeforeClass;
+import net.serenitybdd.annotations.Managed;
+import net.serenitybdd.annotations.Steps;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
@@ -52,11 +50,6 @@ public class WhenDinaBrowsesTheWeb {
     ProfileQuestion profile = new ProfileQuestion();
 
     BankBalanceQuestion balances = new BankBalanceQuestion();
-
-    @BeforeClass
-    public static void setupDriver() {
-        WebDriverManager.chromedriver().setup();
-    }
 
     @Test
     public void dinaCanUpdateHerProfile() {

@@ -1,8 +1,9 @@
 package net.thucydides.junit.runners;
 
-import net.thucydides.core.annotations.Managed;
-import net.thucydides.core.annotations.ManagedPages;
-import net.thucydides.core.annotations.Steps;
+import net.serenitybdd.junit.runners.SerenityRunner;
+import net.serenitybdd.annotations.Managed;
+import net.serenitybdd.annotations.ManagedPages;
+import net.serenitybdd.annotations.Steps;
 import net.thucydides.core.pages.Pages;
 import net.thucydides.samples.IndexPage;
 import net.thucydides.samples.SampleScenarioSteps;
@@ -14,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 ;
 
-@RunWith(ThucydidesRunner.class)
+@RunWith(SerenityRunner.class)
 public class WhenInstantiatingTopLevelPageObjects {
     
     @Managed(driver = "chrome")

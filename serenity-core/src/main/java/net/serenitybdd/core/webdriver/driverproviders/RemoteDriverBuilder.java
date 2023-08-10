@@ -3,11 +3,11 @@ package net.serenitybdd.core.webdriver.driverproviders;
 import com.google.common.base.Splitter;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
-import net.serenitybdd.core.buildinfo.DriverCapabilityRecord;
-import net.serenitybdd.core.di.WebDriverInjectors;
-import net.serenitybdd.core.exceptions.SerenityManagedException;
+import net.serenitybdd.model.buildinfo.DriverCapabilityRecord;
+import net.serenitybdd.core.di.SerenityInfrastructure;
+import net.serenitybdd.model.exceptions.SerenityManagedException;
 import net.thucydides.core.steps.StepEventBus;
-import net.thucydides.core.util.EnvironmentVariables;
+import net.thucydides.model.util.EnvironmentVariables;
 import net.thucydides.core.webdriver.appium.AppiumConfiguration;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
@@ -28,7 +28,7 @@ abstract class RemoteDriverBuilder {
 
     RemoteDriverBuilder(EnvironmentVariables environmentVariables) {
         this.environmentVariables = environmentVariables;
-        this.driverProperties = WebDriverInjectors.getInjector().getInstance(DriverCapabilityRecord.class);
+        this.driverProperties = SerenityInfrastructure.getDriverCapabilityRecord();
     }
 
     abstract WebDriver buildWithOptions(String options) throws MalformedURLException;

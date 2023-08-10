@@ -1,6 +1,5 @@
 package net.serenitybdd.screenplay.ensure.web
 
-import io.github.bonigarcia.wdm.WebDriverManager
 import net.serenitybdd.core.pages.PageObject
 import net.serenitybdd.core.pages.WebElementFacade
 import net.serenitybdd.screenplay.Actor
@@ -8,7 +7,7 @@ import net.serenitybdd.screenplay.abilities.BrowseTheWeb
 import net.serenitybdd.screenplay.actions.Open
 import net.serenitybdd.screenplay.ensure.*
 import net.serenitybdd.screenplay.targets.Target
-import net.thucydides.core.annotations.DefaultUrl
+import net.serenitybdd.annotations.DefaultUrl
 import net.thucydides.core.steps.BaseStepListener
 import net.thucydides.core.steps.StepEventBus
 import org.junit.jupiter.api.AfterAll
@@ -39,7 +38,6 @@ class WhenUsingFluentAssertionsWithWebElementLocators {
     val outputDirectory: Path
 
     init {
-        WebDriverManager.chromedriver().setup();
         val options = ChromeOptions()
         options.addArguments("headless","remote-allow-origins=*")
         driver = ChromeDriver(options)

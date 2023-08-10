@@ -7,7 +7,7 @@
     <packaging>pom</packaging>
     <description>Serenity BDD Core Libraries</description>
     <name>Serenity BDD</name>
-    <version>3.8.2-SNAPSHOT</version>
+    <version>4.0.0-beta-3-SNAPSHOT</version>
     <url>https://serenity-bdd.github.io/</url>
 
     <licenses>
@@ -37,34 +37,34 @@
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
 
         <junit.version>4.13.2</junit.version>
-        <groovy.version>4.0.10</groovy.version>
+        <groovy.version>4.0.13</groovy.version>
         <spock.version>2.2-M1-groovy-4.0</spock.version>
-        <byte-buddy.version>1.14.4</byte-buddy.version>
+        <byte-buddy.version>1.14.5</byte-buddy.version>
         <guava.version>31.1-jre</guava.version>
         <hamcrest.version>2.2</hamcrest.version>
 <!--        <slf4j.version>1.7.30</slf4j.version>-->
         <slf4j.version>2.0.7</slf4j.version>
-        <guice.version>5.1.0</guice.version>
-        <cucumber.version>7.12.0</cucumber.version>
+<!--        <guice.version>5.1.0</guice.version>-->
+        <cucumber.version>7.13.0</cucumber.version>
         <gson.version>2.10.1</gson.version>
-        <junit5.version>5.9.2</junit5.version>
+        <junit5.version>5.10.0</junit5.version>
         <mockito.version>3.3.3</mockito.version>
         <assertj.version>3.24.2</assertj.version>
-        <commons.lang.version>3.12.0</commons.lang.version>
+        <commons.lang.version>3.13.0</commons.lang.version>
         <commons.lang2.version>2.6</commons.lang2.version>
         <commons.io.version>2.11.0</commons.io.version>
         <commons.text.version>1.10.0</commons.text.version>
         <commons.beanutils.version>1.9.4</commons.beanutils.version>
         <commons.collections.version>3.2.2</commons.collections.version>
         <commons.net.version>3.9.0</commons.net.version>
-        <commons.codec.version>1.15</commons.codec.version>
+        <commons.codec.version>1.16.0</commons.codec.version>
         <freemarker.version>2.3.32</freemarker.version>
-        <selenium.version>4.10.0</selenium.version>
-        <htmlunit.driver.version>4.8.1</htmlunit.driver.version>
+        <selenium.version>4.11.0</selenium.version>
+        <htmlunit.driver.version>4.10.0</htmlunit.driver.version>
         <jsonassert.version>1.5.1</jsonassert.version>
         <jsoup.version>1.15.4</jsoup.version>
         <joda-time.version>2.12.2</joda-time.version>
@@ -75,26 +75,26 @@
         <awaitility.version>4.2.0</awaitility.version>
         <freemarker.version>2.3.31</freemarker.version>
         <appium.version>8.3.0</appium.version>
-        <fluentlenium.version>0.10.2</fluentlenium.version>
-        <htmlunit.version>3.0.0</htmlunit.version>
         <webdrivermanager.version>5.3.2</webdrivermanager.version>
+        <fluentlenium.version>0.10.2</fluentlenium.version>
+        <htmlunit.version>3.4.0</htmlunit.version>
         <filters.version>2.0.235</filters.version>
         <ngwebdriver.version>1.1.6</ngwebdriver.version>
         <spring.version>5.3.25</spring.version>
-        <spring.boot.version>2.7.5</spring.boot.version>
-        <jimfs.version>1.2</jimfs.version>
+        <spring.boot.version>2.7.14</spring.boot.version>
+        <jimfs.version>1.3.0</jimfs.version>
         <jbehave.version>4.8.3</jbehave.version>
         <ant.version>1.10.12</ant.version>
-        <restassured.version>5.3.0</restassured.version>
+        <restassured.version>5.3.1</restassured.version>
         <wiremock.version>1.58</wiremock.version>
-        <thymeleaf.version>3.1.1.RELEASE</thymeleaf.version>
+        <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
         <javassist.version>3.29.2-GA</javassist.version>
-        <jackson.version>2.15.0-rc1</jackson.version>
+        <jackson.version>2.15.2</jackson.version>
         <xchart.version>3.5.2</xchart.version>
         <ehcache.version>3.10.8</ehcache.version>
         <!-- Kotlin config -->
-        <kotlin.version>1.8.10</kotlin.version>
-        <kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
+        <kotlin.version>1.9.0</kotlin.version>
+        <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -211,29 +211,29 @@
             </dependency>
 
             <!-- Guice dependencies -->
-            <dependency>
-                <groupId>com.google.inject</groupId>
-                <artifactId>guice</artifactId>
-                <version>${guice.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.ow2.asm</groupId>
-                        <artifactId>asm</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>asm</groupId>
-                        <artifactId>asm</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.google.guava</groupId>
-                        <artifactId>guava</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.sonatype.sisu.inject</groupId>
-                        <artifactId>cglib</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.google.inject</groupId>-->
+<!--                <artifactId>guice</artifactId>-->
+<!--                <version>${guice.version}</version>-->
+<!--                <exclusions>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>org.ow2.asm</groupId>-->
+<!--                        <artifactId>asm</artifactId>-->
+<!--                    </exclusion>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>asm</groupId>-->
+<!--                        <artifactId>asm</artifactId>-->
+<!--                    </exclusion>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>com.google.guava</groupId>-->
+<!--                        <artifactId>guava</artifactId>-->
+<!--                    </exclusion>-->
+<!--                    <exclusion>-->
+<!--                        <groupId>org.sonatype.sisu.inject</groupId>-->
+<!--                        <artifactId>cglib</artifactId>-->
+<!--                    </exclusion>-->
+<!--                </exclusions>-->
+<!--            </dependency>-->
 
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -432,11 +432,6 @@
                 <version>${fluentlenium.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.bonigarcia</groupId>
-                <artifactId>webdrivermanager</artifactId>
-                <version>${webdrivermanager.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.jhlabs</groupId>
                 <artifactId>filters</artifactId>
                 <version>${filters.version}</version>
@@ -520,7 +515,7 @@
                 <plugin>
                     <groupId>org.codehaus.gmavenplus</groupId>
                     <artifactId>gmavenplus-plugin</artifactId>
-                    <version>1.13.0</version>
+                    <version>3.0.0</version>
                     <executions>
                         <execution>
                             <goals>
@@ -553,7 +548,7 @@
 
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.1.2</version>
                     <configuration>
                         <includes>
                             <include>**/When*</include>
@@ -574,7 +569,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.0.0-M5</version>
+                    <version>3.1.2</version>
                     <configuration>
                         <includes>
                             <include>**/integration/*IT</include>
@@ -610,7 +605,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.0.0-M1</version>
+                    <version>3.1.1</version>
                 </plugin>
                 <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
                 <plugin>
@@ -619,12 +614,12 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.4.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.0.0-M1</version>
+                    <version>3.1.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -632,7 +627,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M3</version>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>enforce</id>
@@ -650,7 +645,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.8</version>
+                <version>1.6.13</version>
                 <extensions>true</extensions>
                 <executions>
                     <execution>
@@ -671,12 +666,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.5.0</version>
                 <configuration>
-                    <source>1.8</source>
+                    <source>11</source>
                     <excludePackageNames>net.thucydides.core.batches.*</excludePackageNames>
                     <failOnWarnings>false</failOnWarnings>
                     <failOnError>false</failOnError>
+                    <doclint>all,-missing</doclint>
                 </configuration>
             </plugin>
             <plugin>
@@ -711,16 +707,25 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.0.0-M4</version>
+                <version>3.1.2</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.5.0</version>
                 <configuration>
-                    <source>1.8</source>
+                    <source>11</source>
                     <excludePackageNames>net.thucydides.core.batches.*</excludePackageNames>
                     <failOnWarnings>false</failOnWarnings>
+                    <excludePackageNames>io.netty.*</excludePackageNames>
+                    <excludePackageNames>org.eclipse.*</excludePackageNames>
+                    <excludePackageNames>io.cucumber.*</excludePackageNames>
+                    <excludePackageNames>org.apache.*</excludePackageNames>
+                    <excludePackageNames>org.assertj.*</excludePackageNames>
+                    <excludePackageNames>org.seleniumhq.*</excludePackageNames>
+                    <excludePackageNames>io.opentelemetry.*</excludePackageNames>
+                    <excludePackageNames>com.google.*</excludePackageNames>
+                    <excludePackageNames>org.checkerframework.*</excludePackageNames>
                 </configuration>
             </plugin>
         </plugins>
@@ -761,6 +766,7 @@
         <module>serenity-cli</module>
         <module>serenity-screenplay-playwright</module>
         <module>serenity-bitbar</module>
+        <module>serenity-selenoid</module>
     </modules>
     <profiles>
         <profile>
@@ -838,7 +844,7 @@
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>3.2.0</version>
                         <configuration>
-                            <source>1.8</source>
+                            <source>11</source>
                         </configuration>
                         <executions>
                             <execution>

@@ -2,21 +2,24 @@ package net.thucydides.core.reports.html;
 
 import com.github.rjeschke.txtmark.Configuration;
 import com.google.common.base.Splitter;
-import com.google.inject.Inject;
 import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-import net.thucydides.core.ThucydidesSystemProperty;
-import net.thucydides.core.environment.SystemEnvironmentVariables;
-import net.thucydides.core.model.TestOutcome;
-import net.thucydides.core.model.TestTag;
-import net.thucydides.core.requirements.reports.RenderMarkdown;
-import net.thucydides.core.requirements.reports.RequirementsOutcomes;
-import net.thucydides.core.util.EnvironmentVariables;
-import net.thucydides.core.util.Inflector;
+import net.thucydides.model.ThucydidesSystemProperty;
+import net.thucydides.model.environment.SystemEnvironmentVariables;
+import net.thucydides.model.domain.TestOutcome;
+import net.thucydides.model.domain.TestTag;
+import net.thucydides.model.reports.html.ContextIconFormatter;
+import net.thucydides.model.reports.html.ExampleTable;
+import net.thucydides.model.reports.html.MarkdownRendering;
+import net.thucydides.model.reports.html.ResultIconFormatter;
+import net.thucydides.model.requirements.reports.RenderMarkdown;
+import net.thucydides.model.requirements.reports.RequirementsOutcomes;
+import net.thucydides.model.util.EnvironmentVariables;
+import net.thucydides.model.util.Inflector;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.translate.AggregateTranslator;
 import org.apache.commons.lang3.text.translate.CharSequenceTranslator;
@@ -46,8 +49,6 @@ import static org.apache.commons.lang3.StringUtils.*;
  * In particular, this integrates JIRA links into the generated reports.
  */
 public class Formatter {
-
-
     private static final String ELIPSE = "&hellip;";
     private static final String MARKDOWN = "markdown";
     private static final String TEXT = "";
@@ -72,7 +73,6 @@ public class Formatter {
     Parser parser;
     HtmlRenderer renderer;
 
-    @Inject
     public Formatter(EnvironmentVariables environmentVariables) {
         this.environmentVariables = environmentVariables;
 
@@ -173,6 +173,10 @@ public class Formatter {
         }
         matchingTag.appendTail(renderedTitle);
         return renderedTitle.toString();
+    }
+
+    public String breadcrumbFormat(String parent, String child) {
+        return parent.replace("/"," > ") + " > " + child;
     }
 
     public String renderHtmlEscapedDescription(final String text) {

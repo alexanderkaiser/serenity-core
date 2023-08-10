@@ -1,9 +1,9 @@
 package net.thucydides.core.requirements;
 
 import com.google.common.io.Resources;
-import net.serenitybdd.core.environment.ConfiguredEnvironment;
-import net.thucydides.core.ThucydidesSystemProperty;
-import net.thucydides.core.util.EnvironmentVariables;
+import net.serenitybdd.model.environment.ConfiguredEnvironment;
+import net.thucydides.model.ThucydidesSystemProperty;
+import net.thucydides.model.util.EnvironmentVariables;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -37,7 +37,7 @@ public class FeatureOrStoryFile {
         if (Paths.get(filename).toFile().exists()) {
             return Paths.get(filename).toFile();
         }
-        String requirementsDirectory = ThucydidesSystemProperty.THUCYDIDES_REQUIREMENTS_DIR.from(environmentVariables, type.name());
+        String requirementsDirectory = ThucydidesSystemProperty.SERENITY_REQUIREMENTS_DIR.from(environmentVariables, type.name());
         String featureFileOnClassPath = (filename.startsWith(requirementsDirectory)) ? filename : requirementsDirectory + "/" + filename;
         try {
             return Paths.get(Resources.getResource(featureFileOnClassPath).getFile()).toFile();

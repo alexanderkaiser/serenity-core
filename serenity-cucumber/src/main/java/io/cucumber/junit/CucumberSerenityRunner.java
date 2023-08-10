@@ -11,8 +11,10 @@ import java.time.Clock;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.function.Supplier;
-import net.thucydides.core.guice.Injectors;
-import net.thucydides.core.webdriver.Configuration;
+
+import net.serenitybdd.core.di.SerenityInfrastructure;
+import net.serenitybdd.core.di.SerenityInfrastructure;
+import net.thucydides.model.webdriver.Configuration;
 import org.junit.runners.model.InitializationError;
 
 /**
@@ -45,7 +47,7 @@ public class CucumberSerenityRunner extends CucumberSerenityBaseRunner {
 
         ThreadLocalRunnerSupplier runnerSupplier = initializeServices(clazz, runtimeOptions);
 
-        Configuration systemConfiguration = Injectors.getInjector().getInstance(Configuration.class);
+        Configuration systemConfiguration = SerenityInfrastructure.getConfiguration();
         SerenityReporter reporter = new SerenityReporter(systemConfiguration);
         addPluginIfNotInList(reporter, SerenityReporter.class);
 

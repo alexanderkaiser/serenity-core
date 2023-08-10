@@ -1,17 +1,14 @@
 package net.serenitybdd.core.webdriver.driverproviders;
 
-import net.serenitybdd.core.buildinfo.DriverCapabilityRecord;
-import net.serenitybdd.core.di.WebDriverInjectors;
-import net.serenitybdd.core.webdriver.servicepools.ChromeServicePool;
-import net.serenitybdd.core.webdriver.servicepools.DriverServicePool;
+import net.serenitybdd.model.buildinfo.DriverCapabilityRecord;
+import net.serenitybdd.core.di.SerenityInfrastructure;
 import net.thucydides.core.fixtureservices.FixtureProviderService;
 import net.thucydides.core.steps.StepEventBus;
 import net.thucydides.core.steps.TestContext;
-import net.thucydides.core.util.EnvironmentVariables;
+import net.thucydides.model.util.EnvironmentVariables;
 import net.thucydides.core.webdriver.capabilities.W3CCapabilities;
 import net.thucydides.core.webdriver.stubs.WebDriverStub;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeDriverService;
 import org.openqa.selenium.edge.EdgeOptions;
@@ -28,7 +25,7 @@ public class EdgeDriverProvider extends DownloadableDriverProvider implements Dr
 
     public EdgeDriverProvider(FixtureProviderService fixtureProviderService) {
         this.fixtureProviderService = fixtureProviderService;
-        this.driverProperties = WebDriverInjectors.getInjector().getInstance(DriverCapabilityRecord.class);
+        this.driverProperties = SerenityInfrastructure.getDriverCapabilityRecord();
     }
 
     @Override
@@ -38,7 +35,7 @@ public class EdgeDriverProvider extends DownloadableDriverProvider implements Dr
             return new WebDriverStub();
         }
         // Download the driver using WebDriverManager if required
-        downloadDriverIfRequired("edge", environmentVariables);
+//        downloadDriverIfRequired("edge", environmentVariables);
         //
         // Update the binary path if necessary
         //

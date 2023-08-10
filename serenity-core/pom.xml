@@ -5,7 +5,7 @@
     <parent>
         <artifactId>serenity-bdd</artifactId>
         <groupId>net.serenity-bdd</groupId>
-        <version>3.8.2-SNAPSHOT</version>
+        <version>4.0.0-beta-3-SNAPSHOT</version>
     </parent>
     <artifactId>serenity-core</artifactId>
     <packaging>jar</packaging>
@@ -302,10 +302,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.jhlabs</groupId>
             <artifactId>filters</artifactId>
         </dependency>
@@ -359,6 +355,12 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit5.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -3,8 +3,9 @@ package net.serenitybdd.cucumber.suiteslicing;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cucumber.gherkin.CucumberScenarioLoader;
+import net.serenitybdd.model.environment.ConfiguredEnvironment;
 import net.serenitybdd.cucumber.util.PathUtils;
-import net.thucydides.core.util.EnvironmentVariables;
+import net.thucydides.model.util.EnvironmentVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,6 @@ import java.util.stream.IntStream;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static java.util.stream.Collectors.toList;
-import static net.thucydides.core.ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY;
 
 public class CucumberScenarioVisualiser {
 
@@ -30,7 +30,7 @@ public class CucumberScenarioVisualiser {
 
 
     private String outputDirectory() {
-        return environmentVariables.getProperty(SERENITY_OUTPUT_DIRECTORY, "target/site/serenity");
+        return ConfiguredEnvironment.getConfiguration().getOutputDirectory().getPath();
     }
 
     public static List<VisualisableCucumberScenarios> sliceIntoForks(int forkCount, List<WeightedCucumberScenarios> slices) {

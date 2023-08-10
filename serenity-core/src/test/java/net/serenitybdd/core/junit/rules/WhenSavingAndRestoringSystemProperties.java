@@ -1,11 +1,11 @@
 package net.serenitybdd.core.junit.rules;
 
 
-import net.serenitybdd.core.SerenitySystemProperties;
-import net.thucydides.core.ThucydidesSystemProperty;
-import net.thucydides.core.issues.SystemPropertiesIssueTracking;
+import net.serenitybdd.model.SerenitySystemProperties;
+import net.thucydides.model.ThucydidesSystemProperty;
+import net.thucydides.model.issues.SystemPropertiesIssueTracking;
 import net.thucydides.core.junit.rules.SaveWebdriverSystemPropertiesRule;
-import net.thucydides.core.environment.SystemEnvironmentVariables;
+import net.thucydides.model.environment.SystemEnvironmentVariables;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.*;
 
 public class WhenSavingAndRestoringSystemProperties {
 
-    private static final String SYSTEM_PROPERTY = ThucydidesSystemProperty.THUCYDIDES_REPORT_RESOURCES.getPropertyName();
+    private static final String SYSTEM_PROPERTY = ThucydidesSystemProperty.SERENITY_REPORT_RESOURCES.getPropertyName();
     @Mock
     Statement statement;
 
@@ -75,7 +75,7 @@ public class WhenSavingAndRestoringSystemProperties {
 
         SerenitySystemProperties.getProperties().setValue(ThucydidesSystemProperty.SERENITY_ISSUE_TRACKER_URL, "http://arbitrary.issue.tracker");
 
-        String updatedIssueTracker = SerenitySystemProperties.getProperties().getValue(ThucydidesSystemProperty.SERENITY_ISSUE_TRACKER_URL);;
+        String updatedIssueTracker = SerenitySystemProperties.getProperties().getValue(ThucydidesSystemProperty.SERENITY_ISSUE_TRACKER_URL);
 
         assertThat(updatedIssueTracker, is(not(originalIssueTracker)));
 

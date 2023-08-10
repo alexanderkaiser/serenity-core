@@ -1,12 +1,15 @@
 package net.serenitybdd.junit.runners;
 
-import net.thucydides.core.batches.SystemVariableBasedBatchManager;
-import net.thucydides.core.batches.TestCountBasedBatchManager;
+import net.serenitybdd.core.di.SerenityInfrastructure;
+import net.thucydides.model.batches.SystemVariableBasedBatchManager;
+import net.thucydides.model.batches.TestCountBasedBatchManager;
+import net.thucydides.model.environment.SystemEnvironmentVariables;
 import net.thucydides.core.webdriver.DriverConfigurationError;
 import net.thucydides.junit.rules.SaveWebdriverSystemPropertiesRule;
 import net.thucydides.samples.SuccessfulSingleTestScenario;
 import net.thucydides.samples.SuccessfulSingleTestScenarioWithABrowser;
 import net.thucydides.samples.SuccessfulSingleTestScenarioWithWrongBrowser;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +36,10 @@ public class WhenInstanciatingANewTestRunner extends AbstractTestStepRunnerTest 
     @Rule
     public MethodRule saveSystemProperties = new SaveWebdriverSystemPropertiesRule();
 
+//    @Before
+//    public void initEnvironment() {
+//        SerenityInfrastructure.resetBatchManager();
+//    }
 
     @Test
     public void the_default_output_directory_should_follow_the_maven_convention() throws InitializationError {
@@ -107,9 +114,9 @@ public class WhenInstanciatingANewTestRunner extends AbstractTestStepRunnerTest 
     @Test
     public void the_output_directory_can_be_defined_by_a_system_property() throws InitializationError {
 
-        environmentVariables.setProperty("thucydides.outputDirectory", "target" + FILE_SEPARATOR
+        environmentVariables.setProperty("serenity.outputDirectory", "target" + FILE_SEPARATOR
                 + "reports" + FILE_SEPARATOR
-                + "thucydides");
+                + "serenity");
 
         SerenityRunner runner = getTestRunnerUsing(SuccessfulSingleTestScenario.class);
 
@@ -117,7 +124,7 @@ public class WhenInstanciatingANewTestRunner extends AbstractTestStepRunnerTest 
 
         assertThat(outputDirectory.getPath(), is("target" + FILE_SEPARATOR
                 + "reports" + FILE_SEPARATOR
-                + "thucydides"));
+                + "serenity"));
 
     }
 
@@ -126,13 +133,13 @@ public class WhenInstanciatingANewTestRunner extends AbstractTestStepRunnerTest 
 
         SerenityRunner runner = getTestRunnerUsing(SuccessfulSingleTestScenario.class);
 
-        environmentVariables.setProperty("thucydides.outputDirectory", "target/reports/thucydides");
+        environmentVariables.setProperty("serenity.outputDirectory", "target/reports/serenity");
 
         File outputDirectory = runner.getOutputDirectory();
 
         assertThat(outputDirectory.getPath(), is("target" + FILE_SEPARATOR
                 + "reports" + FILE_SEPARATOR
-                + "thucydides"));
+                + "serenity"));
 
     }
 
@@ -147,8 +154,9 @@ public class WhenInstanciatingANewTestRunner extends AbstractTestStepRunnerTest 
     @Test
     public void a_batch_runner_can_be_overridden_using_system_property() throws InitializationError {
 
-//        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_BATCH_STRATEGY.getPropertyName(), BatchStrategy.DIVIDE_BY_TEST_COUNT.name());
-        environmentVariables.setProperty("thucydides.batch.strategy", "DIVIDE_BY_TEST_COUNT");
+        SerenityInfrastructure.resetBatchManager();
+
+        SystemEnvironmentVariables.currentEnvironment().setProperty("serenity.batch.strategy", "DIVIDE_BY_TEST_COUNT");
 
         SerenityRunner runner = getTestRunnerUsing(SuccessfulSingleTestScenario.class);
 

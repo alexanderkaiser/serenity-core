@@ -17,23 +17,28 @@ import io.cucumber.tagexpressions.Expression;
 import net.serenitybdd.core.Serenity;
 import net.serenitybdd.core.SerenityListeners;
 import net.serenitybdd.core.SerenityReports;
+import net.serenitybdd.core.di.SerenityInfrastructure;
 import net.serenitybdd.core.webdriver.configuration.RestartBrowserForEach;
 import net.serenitybdd.cucumber.CucumberWithSerenity;
+import net.serenitybdd.cucumber.events.SetTestManualEvent;
+import net.serenitybdd.cucumber.events.StepFinishedWithResultEvent;
 import net.serenitybdd.cucumber.formatting.ScenarioOutlineDescription;
 import net.serenitybdd.cucumber.util.PathUtils;
 import net.serenitybdd.cucumber.util.StepDefinitionAnnotationReader;
-import net.thucydides.core.guice.Injectors;
-import net.thucydides.core.model.DataTable;
-import net.thucydides.core.model.Rule;
-import net.thucydides.core.model.*;
 import net.thucydides.core.model.screenshots.StepDefinitionAnnotations;
-import net.thucydides.core.reports.ReportService;
-import net.thucydides.core.screenshots.ScreenshotAndHtmlSource;
+import net.thucydides.model.domain.DataTable;
+import net.thucydides.model.domain.Rule;
+import net.thucydides.model.domain.*;
+import net.thucydides.model.reports.ReportService;
+import net.thucydides.model.requirements.FeatureFilePath;
+import net.thucydides.model.screenshots.ScreenshotAndHtmlSource;
 import net.thucydides.core.steps.*;
 import net.thucydides.core.steps.events.*;
 import net.thucydides.core.steps.session.TestSession;
-import net.thucydides.core.util.Inflector;
-import net.thucydides.core.webdriver.Configuration;
+import net.thucydides.model.steps.ExecutedStepDescription;
+import net.thucydides.model.steps.TestSourceType;
+import net.thucydides.model.util.Inflector;
+import net.thucydides.model.webdriver.Configuration;
 import net.thucydides.core.webdriver.SerenityWebdriverManager;
 import net.thucydides.core.webdriver.ThucydidesWebDriverSupport;
 import net.thucydides.core.webdriver.WebDriverFacade;
@@ -47,6 +52,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
@@ -69,19 +75,17 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
 
     private static final String SCENARIO_OUTLINE_NOT_KNOWN_YET = "";
 
-    private Configuration systemConfiguration;
+    private final Configuration systemConfiguration;
 
     private final static String FEATURES_ROOT_PATH = "/features/";
     private final static String FEATURES_CLASSPATH_ROOT_PATH = ":features/";
 
-    private FeatureFileLoader featureLoader = new FeatureFileLoader();
+    private final FeatureFileLoader featureLoader = new FeatureFileLoader();
 
     private LineFilters lineFilters;
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SerenityReporter.class);
-
-    private ManualScenarioChecker manualScenarioDateChecker;
 
     private final Set<URI> contextURISet = new CopyOnWriteArraySet<>();
 
@@ -101,16 +105,14 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
      * in @CucumberOptions.
      */
     public SerenityReporterParallel() {
-        this.systemConfiguration = Injectors.getInjector().getInstance(Configuration.class);
-        this.manualScenarioDateChecker = new ManualScenarioChecker(systemConfiguration.getEnvironmentVariables());
+        this.systemConfiguration = SerenityInfrastructure.getConfiguration();
     }
 
     public SerenityReporterParallel(Configuration systemConfiguration) {
         this.systemConfiguration = systemConfiguration;
-        this.manualScenarioDateChecker = new ManualScenarioChecker(systemConfiguration.getEnvironmentVariables());
     }
 
-    private FeaturePathFormatter featurePathFormatter = new FeaturePathFormatter();
+    private final FeaturePathFormatter featurePathFormatter = new FeaturePathFormatter();
 
     private StepEventBus getStepEventBus(URI featurePath) {
         URI prefixedPath = featurePathFormatter.featurePathWithPrefixIfNecessary(featurePath);
@@ -132,14 +134,14 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
         getContext(featurePath).addBaseStepListener(listeners.getBaseStepListener());
     }
 
-    private EventHandler<TestSourceRead> testSourceReadHandler = this::handleTestSourceRead;
-    private EventHandler<TestCaseStarted> caseStartedHandler = this::handleTestCaseStarted;
-    private EventHandler<TestCaseFinished> caseFinishedHandler = this::handleTestCaseFinished;
-    private EventHandler<TestStepStarted> stepStartedHandler = this::handleTestStepStarted;
-    private EventHandler<TestStepFinished> stepFinishedHandler = this::handleTestStepFinished;
-    private EventHandler<TestRunStarted> runStartedHandler = this::handleTestRunStarted;
-    private EventHandler<TestRunFinished> runFinishedHandler = this::handleTestRunFinished;
-    private EventHandler<WriteEvent> writeEventHandler = this::handleWrite;
+    private final EventHandler<TestSourceRead> testSourceReadHandler = this::handleTestSourceRead;
+    private final EventHandler<TestCaseStarted> caseStartedHandler = this::handleTestCaseStarted;
+    private final EventHandler<TestCaseFinished> caseFinishedHandler = this::handleTestCaseFinished;
+    private final EventHandler<TestStepStarted> stepStartedHandler = this::handleTestStepStarted;
+    private final EventHandler<TestStepFinished> stepFinishedHandler = this::handleTestStepFinished;
+    private final EventHandler<TestRunStarted> runStartedHandler = this::handleTestRunStarted;
+    private final EventHandler<TestRunFinished> runFinishedHandler = this::handleTestRunFinished;
+    private final EventHandler<WriteEvent> writeEventHandler = this::handleWrite;
 
     private void handleTestRunStarted(TestRunStarted event) {
         LOGGER.debug("SRP:handleTestRunStarted {} ", Thread.currentThread());
@@ -181,11 +183,7 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
         boolean useDecodedURI = systemConfiguration.getEnvironmentVariables().getPropertyAsBoolean("use.decoded.url", false);
         String pathURIAsString;
         if (useDecodedURI) {
-            try {
-                pathURIAsString = URLDecoder.decode(fullPathUri.toString(), StandardCharsets.UTF_8.name());
-            } catch (UnsupportedEncodingException e) {
-                pathURIAsString = fullPathUri.toString();
-            }
+            pathURIAsString = URLDecoder.decode(fullPathUri.toString(), StandardCharsets.UTF_8);
         } else {
             pathURIAsString = fullPathUri.toString();
         }
@@ -227,8 +225,10 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
         }
     }
 
-    private Story userStoryFrom(Feature feature, String featureFileUriString) {
-        Story userStory = Story.withIdAndPath(TestSourcesModel.convertToId(feature.getName()), feature.getName(), featureFileUriString).asFeature();
+    private Story userStoryFrom(Feature feature, String featureFileUri) {
+        String relativePath = new FeatureFilePath(systemConfiguration.getEnvironmentVariables()).relativePathFor(featureFileUri);
+        String id = relativePath.replace(".feature", "");
+        Story userStory = Story.withIdAndPath(id, feature.getName(), featureFileUri).asFeature();
         if (!isEmpty(feature.getDescription())) {
             userStory = userStory.withNarrative(feature.getDescription());
         }
@@ -252,6 +252,7 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
                 }
                 FeatureTracker.startNewFeature(event);
             }
+            ConfigureDriverFromTags.forTags(event.getTestCase().getTags());
 
             String scenarioName = event.getTestCase().getName();
             TestSourcesModel.AstNode astNode = featureLoader.getAstNode(featurePath, event.getTestCase().getLocation().getLine());
@@ -270,7 +271,7 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
                 boolean newScenario = !scenarioId.equals(context.getCurrentScenario(scenarioId));
                 if (newScenario) {
                     configureDriver(currentFeature.get(), event.getTestCase().getUri());
-                    if (currentScenarioDefinition.getExamples().size() > 0) {
+                    if (!currentScenarioDefinition.getExamples().isEmpty()) {
                         context.startNewExample(scenarioId);
                         LOGGER.debug("SRP:startNewExample {} {} {} at line {} ", event.getTestCase().getUri(), Thread.currentThread(),
                                 event.getTestCase().getId(), event.getTestCase().getLocation().getLine());
@@ -286,7 +287,8 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
                         startProcessingExampleLine(scenarioId, featurePath, event.getTestCase(), Long.valueOf(event.getTestCase().getLocation().getLine()), scenarioName);
                     }
                 }
-                TestSourcesModel.getBackgroundForTestCase(astNode).ifPresent(background -> handleBackground(featurePath, event.getTestCase(), background));
+                final String scenarioIdForBackground =  scenarioId;
+                TestSourcesModel.getBackgroundForTestCase(astNode).ifPresent(background -> handleBackground(featurePath, scenarioIdForBackground, background));
                 //
                 // Check for tags
                 //
@@ -305,12 +307,12 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
             }
 
         } catch (Throwable t) {
-            t.printStackTrace();
+            LOGGER.error("Test case started failed with error ", t);
             throw t;
         }
     }
 
-    private static Map<UUID, TestResult> MANUAL_TEST_RESULTS_CACHE = new HashMap<>();
+    private final static Map<UUID, TestResult> MANUAL_TEST_RESULTS_CACHE = new HashMap<>();
 
     private io.cucumber.messages.types.Rule getRuleForTestCase(TestSourcesModel.AstNode astNode) {
         Feature feature = getFeatureForTestCase(astNode);
@@ -367,6 +369,11 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
         }
         getContext(featurePath).storeAllStepEventBusEventsForLine(event.getTestCase().getLocation().getLine(), event.getTestCase());
         getContext(featurePath).clearStepQueue(event.getTestCase());
+        getContext(featurePath).stepEventBus().clear();
+
+        // We need to close the driver here to avoid wasting resources and causing timeouts with Selenium Grid services
+        getContext(featurePath).stepEventBus().getBaseStepListener().cleanupWebdriverInstance(getContext(featurePath).stepEventBus().isCurrentTestDataDriven());
+
     }
 
     private Status eventStatusFor(TestCaseFinished event) {
@@ -403,6 +410,7 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
     }
 
     private void handleTestStepStarted(TestStepStarted event) {
+        ZonedDateTime startTime = ZonedDateTime.now();
         URI featurePath = event.getTestCase().getUri();
         TestSourcesModel.AstNode mainAstNode = featureLoader.getAstNode(featurePath, event.getTestCase().getLocation().getLine());
         Scenario currentScenarioDefinition = TestSourcesModel.getScenarioDefinition(mainAstNode);
@@ -438,7 +446,7 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
                     io.cucumber.messages.types.Step currentStep = getContext(featurePath).getCurrentStep(event.getTestCase());
                     String stepTitle = stepTitleFrom(currentStep, pickleTestStep);
                     getContext(featurePath).addStepEventBusEvent(
-                            new StepStartedEvent(ExecutedStepDescription.withTitle(stepTitle)));
+                            new StepStartedEvent(ExecutedStepDescription.withTitle(stepTitle),startTime));
                     getContext(featurePath).addStepEventBusEvent(
                             new UpdateCurrentStepTitleEvent(normalized(stepTitle)));
                 }
@@ -925,8 +933,8 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
     }
 
 
-    private void handleBackground(URI featurePath, TestCase testCase, Background background) {
-        getContext(featurePath).setWaitingToProcessBackgroundSteps(true);
+    private void handleBackground(URI featurePath,String scenarioId,  Background background) {
+        getContext(featurePath).setWaitingToProcessBackgroundSteps(scenarioId,true);
         String backgroundName = background.getName();
         if (backgroundName != null) {
             getContext(featurePath).addStepEventBusEvent(
@@ -973,14 +981,15 @@ public class SerenityReporterParallel implements Plugin, ConcurrentEventListener
     }
 
     private void recordStepResult(URI featurePath, TestCase testCase, Result result, io.cucumber.messages.types.Step currentStep, TestStep currentTestStep) {
+        ZonedDateTime endTime = ZonedDateTime.now();
         List<ScreenshotAndHtmlSource> screenshotList = getContext(featurePath).stepEventBus().takeScreenshots();
-        getContext(featurePath).addStepEventBusEvent(new RecordStepResultEvent(result, currentStep, currentTestStep, screenshotList));
+        getContext(featurePath).addStepEventBusEvent(new StepFinishedWithResultEvent(result, currentStep, currentTestStep, screenshotList, endTime));
     }
 
     private void recordFinalResult(String scenarioId, URI featurePath, TestCase testCase) {
         ScenarioContextParallel context = getContext(featurePath);
-        if (context.isWaitingToProcessBackgroundSteps()) {
-            context.setWaitingToProcessBackgroundSteps(false);
+        if (context.isWaitingToProcessBackgroundSteps(scenarioId)) {
+            context.setWaitingToProcessBackgroundSteps(scenarioId,false);
         } else {
             updateResultFromTags(scenarioId, featurePath, testCase, context.getScenarioTags(scenarioId));
         }

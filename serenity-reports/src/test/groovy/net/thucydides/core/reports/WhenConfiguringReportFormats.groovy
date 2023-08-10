@@ -1,6 +1,8 @@
 package net.thucydides.core.reports
 
-import net.thucydides.core.environment.MockEnvironmentVariables
+import net.thucydides.model.environment.MockEnvironmentVariables
+import net.thucydides.model.reports.FormatConfiguration
+import net.thucydides.model.reports.OutcomeFormat
 import spock.lang.Specification
 
 /**
@@ -10,25 +12,14 @@ class WhenConfiguringReportFormats extends Specification {
 
     def environmentVars = new MockEnvironmentVariables()
 
-    def "should produce JSON and HTML by default"() {
+    def "should produce JSON by default"() {
         given:
-            FormatConfiguration formatConfiguration = new FormatConfiguration(environmentVars)
+        FormatConfiguration formatConfiguration = new FormatConfiguration(environmentVars)
         when:
             List<String> formats = formatConfiguration.getFormats()
         then:
-            formats == [OutcomeFormat.JSON, OutcomeFormat.HTML]
+            formats == [OutcomeFormat.JSON]
     }
-
-    def "should be able to make XML the preference"() {
-        given:
-            environmentVars.setProperty("output.formats","xml, json")
-            FormatConfiguration formatConfiguration = new FormatConfiguration(environmentVars)
-        when:
-            List<String> formats = formatConfiguration.getFormats()
-        then:
-            formats == [OutcomeFormat.XML,OutcomeFormat.JSON]
-    }
-
 
     def "should be able to define a unique format"() {
         given:
@@ -43,12 +34,12 @@ class WhenConfiguringReportFormats extends Specification {
 
     def "should ignore case"() {
         given:
-        environmentVars.setProperty("output.formats","xMl")
+        environmentVars.setProperty("output.formats","Json")
         FormatConfiguration formatConfiguration = new FormatConfiguration(environmentVars)
         when:
         List<String> formats = formatConfiguration.getFormats()
         then:
-        formats == [OutcomeFormat.XML]
+        formats == [OutcomeFormat.JSON]
     }
 
     def "should ignore unknown formats"() {
@@ -69,7 +60,7 @@ class WhenConfiguringReportFormats extends Specification {
         when:
         List<String> formats = formatConfiguration.getFormats()
         then:
-        formats == [OutcomeFormat.JSON, OutcomeFormat.HTML]
+        formats == [OutcomeFormat.JSON]
     }
 
     def "should use first in list as the preferred format for imports"() {

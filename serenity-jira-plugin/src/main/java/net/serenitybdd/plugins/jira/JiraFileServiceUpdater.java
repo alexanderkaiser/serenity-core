@@ -2,15 +2,16 @@ package net.serenitybdd.plugins.jira;
 
 
 import com.google.common.collect.Lists;
-import com.google.inject.Inject;
-import net.serenitybdd.plugins.jira.guice.Injectors;
+
+import net.serenitybdd.model.di.ModelInfrastructure;
 import net.serenitybdd.plugins.jira.model.IssueTracker;
+import net.serenitybdd.plugins.jira.service.JIRAInfrastructure;
 import net.serenitybdd.plugins.jira.workflow.WorkflowLoader;
-import net.thucydides.core.model.TestOutcome;
-import net.thucydides.core.model.TestOutcomeSummary;
-import net.thucydides.core.reports.JiraUpdaterService;
-import net.thucydides.core.reports.TestOutcomeStream;
-import net.thucydides.core.util.EnvironmentVariables;
+import net.thucydides.model.domain.TestOutcome;
+import net.thucydides.model.domain.TestOutcomeSummary;
+import net.thucydides.model.reports.JiraUpdaterService;
+import net.thucydides.model.reports.TestOutcomeStream;
+import net.thucydides.model.util.EnvironmentVariables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,22 +29,23 @@ public class JiraFileServiceUpdater implements JiraUpdaterService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JiraFileServiceUpdater.class);
     private final TestResultTally<TestOutcomeSummary> resultTally;
-    private Set<String> allIssues;
-    private JiraUpdater jiraUpdater;
+    private final Set<String> allIssues;
+    private final JiraUpdater jiraUpdater;
 
-    @Inject
+    
     public JiraFileServiceUpdater(IssueTracker issueTracker,
                                   EnvironmentVariables environmentVariables,
                                   WorkflowLoader loader) {
-        this.resultTally = new TestResultTally<TestOutcomeSummary>();
+        this.resultTally = new TestResultTally<>();
         this.allIssues = new HashSet<>();
         jiraUpdater = new JiraUpdater(issueTracker,environmentVariables,loader);
     }
 
     public JiraFileServiceUpdater() {
-        this(Injectors.getInjector().getInstance(IssueTracker.class),
-                Injectors.getInjector().getProvider(EnvironmentVariables.class).get() ,
-                Injectors.getInjector().getInstance(WorkflowLoader.class));
+
+        this(JIRAInfrastructure.getIssueTracker(),
+                ModelInfrastructure.getEnvironmentVariables(),
+                JIRAInfrastructure.getWorkflowLoader());
     }
 
     /**

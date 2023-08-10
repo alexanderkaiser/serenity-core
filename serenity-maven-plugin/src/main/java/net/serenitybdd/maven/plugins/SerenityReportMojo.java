@@ -2,12 +2,12 @@ package net.serenitybdd.maven.plugins;
 
 import com.google.common.base.Splitter;
 import net.serenitybdd.core.Serenity;
-import net.thucydides.core.ThucydidesSystemProperty;
-import net.thucydides.core.environment.SystemEnvironmentVariables;
-import net.thucydides.core.guice.Injectors;
+import net.thucydides.model.ThucydidesSystemProperty;
+import net.thucydides.model.environment.SystemEnvironmentVariables;
+import net.serenitybdd.core.di.SerenityInfrastructure;
 import net.thucydides.core.reports.ExtendedReports;
-import net.thucydides.core.util.EnvironmentVariables;
-import net.thucydides.core.webdriver.Configuration;
+import net.thucydides.model.util.EnvironmentVariables;
+import net.thucydides.model.webdriver.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -34,14 +34,13 @@ public class SerenityReportMojo extends AbstractMojo {
     /**
      * Reports are generated here
      */
-    @Parameter(property = "serenity.outputDirectory")
-
+    @Parameter(property = "serenity.outputDirectory", defaultValue = "${basedir}/target/site/serenity")
     public File outputDirectory;
 
     /**
      * Serenity test reports are read from here
      */
-    @Parameter(property = "serenity.sourceDirectory")
+    @Parameter(property = "serenity.sourceDirectory", defaultValue = "${basedir}/target/site/serenity")
     public File sourceDirectory;
 
     /**
@@ -107,7 +106,7 @@ public class SerenityReportMojo extends AbstractMojo {
 
     private Configuration getConfiguration() {
         if (configuration == null) {
-            configuration = Injectors.getInjector().getProvider(Configuration.class).get();
+            configuration = SerenityInfrastructure.getConfiguration();
         }
         return configuration;
     }

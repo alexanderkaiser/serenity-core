@@ -2,17 +2,17 @@ package net.serenitybdd.maven.plugins;
 
 import com.google.common.base.Splitter;
 import net.serenitybdd.core.Serenity;
-import net.thucydides.core.ThucydidesSystemProperty;
-import net.thucydides.core.environment.SystemEnvironmentVariables;
-import net.thucydides.core.guice.Injectors;
-import net.thucydides.core.model.TestResult;
-import net.thucydides.core.reports.ExtendedReports;
-import net.thucydides.core.reports.ResultChecker;
-import net.thucydides.core.reports.TestOutcomes;
-import net.thucydides.core.reports.UserStoryTestReporter;
 import net.thucydides.core.reports.html.HtmlAggregateStoryReporter;
-import net.thucydides.core.util.EnvironmentVariables;
-import net.thucydides.core.webdriver.Configuration;
+import net.thucydides.model.ThucydidesSystemProperty;
+import net.thucydides.model.environment.SystemEnvironmentVariables;
+import net.serenitybdd.core.di.SerenityInfrastructure;
+import net.thucydides.model.domain.TestResult;
+import net.thucydides.core.reports.ExtendedReports;
+import net.thucydides.model.reports.ResultChecker;
+import net.thucydides.model.reports.TestOutcomes;
+import net.thucydides.model.reports.UserStoryTestReporter;
+import net.thucydides.model.util.EnvironmentVariables;
+import net.thucydides.model.webdriver.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -106,13 +106,6 @@ public class SerenityAggregatorMojo extends AbstractMojo {
     public MavenProject project;
 
     /**
-     * If set to true, the HTML reports for the individual tests will also be generated.
-     * This is not normally necessary as the individual test reports are generated when the tests are executed.
-     */
-    @Parameter
-    public boolean generateOutcomes;
-
-    /**
      * Specify a comma-separated list of additional reports to be produced by the aggregate goal.
      */
     @Parameter(property = "serenity.reports")
@@ -128,6 +121,8 @@ public class SerenityAggregatorMojo extends AbstractMojo {
     @Parameter(defaultValue="true")
     public boolean ignoreFailedTests;
 
+    private Path projectDirectory;
+
     protected void setOutputDirectory(final File outputDirectory) {
         this.outputDirectory = outputDirectory;
         getConfiguration().setOutputDirectory(this.outputDirectory);
@@ -138,6 +133,7 @@ public class SerenityAggregatorMojo extends AbstractMojo {
     }
 
     public void prepareExecution() throws MojoExecutionException {
+        projectDirectory = project.getBasedir().toPath();
         configureEnvironmentVariables();
         MavenProjectHelper.propagateBuildDir(session);
         configureOutputDirectorySettings();
@@ -148,20 +144,22 @@ public class SerenityAggregatorMojo extends AbstractMojo {
     }
 
     private void configureOutputDirectorySettings() {
+        getConfiguration().setProjectDirectory(projectDirectory);
+
         if (outputDirectory == null) {
             outputDirectory = getConfiguration().getOutputDirectory();
         }
         if (sourceDirectory == null) {
             sourceDirectory = getConfiguration().getOutputDirectory();
         }
-        final Path projectDir = session.getCurrentProject().getBasedir().toPath();
-
         if (!outputDirectory.isAbsolute()) {
-            outputDirectory = projectDir.resolve(outputDirectory.toPath()).toFile();
+            outputDirectory = projectDirectory.resolve(outputDirectory.toPath()).toFile();
         }
         if (!sourceDirectory.isAbsolute()) {
-            sourceDirectory = projectDir.resolve(sourceDirectory.toPath()).toFile();
+            sourceDirectory = projectDirectory.resolve(sourceDirectory.toPath()).toFile();
         }
+        getLog().info("GENERATING REPORTS FOR: " + projectDirectory);
+        SerenityInfrastructure.getConfiguration().setProjectDirectory(projectDirectory);
     }
 
     private EnvironmentVariables getEnvironmentVariables() {
@@ -173,7 +171,7 @@ public class SerenityAggregatorMojo extends AbstractMojo {
 
     private Configuration getConfiguration() {
         if (configuration == null) {
-            configuration = Injectors.getInjector().getProvider(Configuration.class).get();
+            configuration = SerenityInfrastructure.getConfiguration();
         }
         return configuration;
     }
@@ -263,6 +261,7 @@ public class SerenityAggregatorMojo extends AbstractMojo {
     }
 
     private TestResult generateHtmlStoryReports() throws IOException {
+        getReporter().setProjectDirectory(projectDirectory.toFile().getPath());
         getReporter().setSourceDirectory(sourceDirectory);
         getReporter().setOutputDirectory(outputDirectory);
         getReporter().setIssueTrackerUrl(issueTrackerUrl);
@@ -271,10 +270,7 @@ public class SerenityAggregatorMojo extends AbstractMojo {
         getReporter().setJiraUsername(jiraUsername);
         getReporter().setJiraPassword(jiraPassword);
         getReporter().setTags(tags);
-
-        if (generateOutcomes) {
-            getReporter().setGenerateTestOutcomeReports();
-        }
+        getReporter().setGenerateTestOutcomeReports();
         TestOutcomes outcomes = getReporter().generateReportsForTestResultsFrom(sourceDirectory);
         return new ResultChecker(outputDirectory).checkTestResults(outcomes);
     }
@@ -287,6 +283,7 @@ public class SerenityAggregatorMojo extends AbstractMojo {
         List<String> extendedReportTypes = Splitter.on(",").splitToList(reports);
         ExtendedReports.named(extendedReportTypes).forEach(
                 report -> {
+                    report.setProjectDirectory(projectDirectory.toFile().getPath());
                     report.setSourceDirectory(sourceDirectory.toPath());
                     report.setOutputDirectory(outputDirectory.toPath());
                     Path generatedReport = report.generateReport();

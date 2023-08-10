@@ -1,11 +1,11 @@
 package net.serenitybdd.maven.plugins;
 
-import net.serenitybdd.core.history.FileSystemTestOutcomeSummaryRecorder;
-import net.serenitybdd.core.history.TestOutcomeSummaryRecorder;
-import net.thucydides.core.environment.SystemEnvironmentVariables;
-import net.thucydides.core.guice.Injectors;
-import net.thucydides.core.util.EnvironmentVariables;
-import net.thucydides.core.webdriver.Configuration;
+import net.serenitybdd.model.history.FileSystemTestOutcomeSummaryRecorder;
+import net.serenitybdd.model.history.TestOutcomeSummaryRecorder;
+import net.thucydides.model.environment.SystemEnvironmentVariables;
+import net.serenitybdd.core.di.SerenityInfrastructure;
+import net.thucydides.model.util.EnvironmentVariables;
+import net.thucydides.model.webdriver.Configuration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import static net.thucydides.core.ThucydidesSystemProperty.SERENITY_HISTORY_DIRECTORY;
+import static net.thucydides.model.ThucydidesSystemProperty.SERENITY_HISTORY_DIRECTORY;
 
 /**
  * This plugin records a summary of test results in the target directory
@@ -70,7 +70,7 @@ public class SerenityHistoryMojo extends AbstractMojo {
     }
 
     private Configuration getConfiguration() {
-        return Injectors.getInjector().getProvider(Configuration.class).get();
+        return SerenityInfrastructure.getConfiguration();
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {

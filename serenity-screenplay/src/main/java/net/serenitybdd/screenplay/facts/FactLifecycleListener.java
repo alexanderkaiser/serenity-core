@@ -1,14 +1,15 @@
 package net.serenitybdd.screenplay.facts;
 
 import net.serenitybdd.screenplay.Actor;
-import net.thucydides.core.model.DataTable;
-import net.thucydides.core.model.Story;
-import net.thucydides.core.model.TestOutcome;
-import net.thucydides.core.screenshots.ScreenshotAndHtmlSource;
+import net.thucydides.model.domain.DataTable;
+import net.thucydides.model.domain.Story;
+import net.thucydides.model.domain.TestOutcome;
+import net.thucydides.model.domain.TestResult;
+import net.thucydides.model.screenshots.ScreenshotAndHtmlSource;
 import net.thucydides.core.steps.Droppable;
-import net.thucydides.core.steps.ExecutedStepDescription;
-import net.thucydides.core.steps.StepFailure;
-import net.thucydides.core.steps.StepListener;
+import net.thucydides.model.steps.ExecutedStepDescription;
+import net.thucydides.model.steps.StepFailure;
+import net.thucydides.model.steps.StepListener;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -83,6 +84,11 @@ public class FactLifecycleListener implements StepListener, Droppable {
     }
 
     @Override
+    public void stepFailed(StepFailure failure, List<ScreenshotAndHtmlSource> screenshotList) {
+
+    }
+
+    @Override
     public void lastStepFailed(StepFailure failure) {
 
     }
@@ -109,6 +115,11 @@ public class FactLifecycleListener implements StepListener, Droppable {
 
     @Override
     public void stepFinished(List<ScreenshotAndHtmlSource> screenshotList) {
+
+    }
+
+    @Override
+    public void stepFinished(List<ScreenshotAndHtmlSource> screenshotList, ZonedDateTime time) {
 
     }
 
@@ -179,6 +190,11 @@ public class FactLifecycleListener implements StepListener, Droppable {
 
     @Override
     public void takeScreenshots(List<ScreenshotAndHtmlSource> screenshots) {
+
+    }
+
+    @Override
+    public void takeScreenshots(TestResult testResult, List<ScreenshotAndHtmlSource> screenshots) {
 
     }
 }

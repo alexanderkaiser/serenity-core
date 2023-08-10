@@ -1,16 +1,14 @@
 package net.serenitybdd.screenplay.webtests;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import net.serenitybdd.junit.runners.SerenityRunner;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.abilities.BrowseTheWeb;
 import net.serenitybdd.screenplay.actions.Open;
 import net.serenitybdd.screenplay.targets.Target;
 import net.serenitybdd.screenplay.webtests.pages.HomePage;
-import net.thucydides.core.annotations.Managed;
-import net.thucydides.core.annotations.Screenshots;
+import net.serenitybdd.annotations.Managed;
+import net.serenitybdd.annotations.Screenshots;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
@@ -26,11 +24,6 @@ public class WhenDinaChecksTheStateOfWebElements {
     WebDriver browser;
 
     Actor dana = new Actor("Dana");
-
-    @BeforeClass
-    public static void setupDriver() {
-        WebDriverManager.chromedriver().setup();
-    }
 
     @Before
     public void prepareBrowser() {

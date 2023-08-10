@@ -1,10 +1,10 @@
 package net.serenitybdd.reports.navigator
 
-import net.serenitybdd.core.environment.EnvironmentSpecificConfiguration
+import net.serenitybdd.model.di.ModelInfrastructure
+import net.serenitybdd.model.environment.EnvironmentSpecificConfiguration
 import net.serenitybdd.reports.io.testOutcomesIn
-import net.thucydides.core.guice.Injectors
 import net.thucydides.core.reports.ExtendedReport
-import net.thucydides.core.util.EnvironmentVariables
+import net.thucydides.model.util.EnvironmentVariables
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
@@ -21,6 +21,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.function.Consumer
+import java.util.stream.Collectors
 import kotlin.streams.toList
 
 
@@ -34,7 +35,7 @@ class GenerateReport(
     private var outputDirectory: Path = outputDirectoryDefinedIn(environmentVariables)) : ExtendedReport {
 
 
-  constructor() : this(Injectors.getInjector().getProvider<EnvironmentVariables>(EnvironmentVariables::class.java).get())
+  constructor() : this(ModelInfrastructure.getEnvironmentVariables())
 
   override fun getName(): String = "navigator"
   override fun getDescription(): String = "Full Report As React Based Single Page Application"
@@ -82,7 +83,7 @@ class GenerateReport(
 
   private fun fillTemplateAndWriteToReportDirectory(templateDirectory: Path) {
     val indexHtml = templateDirectory.resolve("index.html")
-    val lines = Files.lines(indexHtml).toList()
+    val lines = Files.lines(indexHtml).collect(Collectors.toList())
 
     if (lines.count() > 1) {
       throw RuntimeException("template index.html is supposed to be a minified into a single line")

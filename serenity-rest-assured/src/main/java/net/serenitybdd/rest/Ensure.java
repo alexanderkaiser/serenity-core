@@ -1,14 +1,17 @@
 package net.serenitybdd.rest;
 
 import io.restassured.response.ValidatableResponse;
-import net.thucydides.core.steps.ExecutedStepDescription;
+import net.thucydides.model.domain.TestResult;
+import net.thucydides.model.screenshots.ScreenshotAndHtmlSource;
+import net.thucydides.model.steps.ExecutedStepDescription;
 import net.thucydides.core.steps.StepEventBus;
-import net.thucydides.core.steps.StepFailure;
+import net.thucydides.model.steps.StepFailure;
 import net.thucydides.core.steps.events.StepFailedEvent;
 import net.thucydides.core.steps.events.StepFinishedEvent;
 import net.thucydides.core.steps.events.StepStartedEvent;
 import net.thucydides.core.steps.session.TestSession;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public class Ensure {
@@ -46,7 +49,8 @@ public class Ensure {
         try {
             check.accept(SerenityRest.then());
         } catch (Throwable e) {
-            TestSession.addEvent(new StepFailedEvent(new StepFailure(ExecutedStepDescription.withTitle(description), e)));
+             List<ScreenshotAndHtmlSource> screenshotList = TestSession.getTestSessionContext().getStepEventBus().takeScreenshots(TestResult.FAILURE);
+            TestSession.addEvent(new StepFailedEvent(new StepFailure(ExecutedStepDescription.withTitle(description), e), screenshotList));
             return;
         }
         TestSession.addEvent(new StepFinishedEvent());

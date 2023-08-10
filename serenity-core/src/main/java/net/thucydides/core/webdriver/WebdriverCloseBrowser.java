@@ -1,13 +1,12 @@
 package net.thucydides.core.webdriver;
 
-import com.google.inject.Inject;
+import net.serenitybdd.core.di.SerenityInfrastructure;
 import net.serenitybdd.core.webdriver.configuration.RestartBrowserForEach;
-import net.thucydides.core.guice.Injectors;
 import net.thucydides.core.junit.SerenityJUnitTestCase;
-import net.thucydides.core.model.TestTag;
-import net.thucydides.core.statistics.TestCount;
+import net.thucydides.model.domain.TestTag;
+import net.thucydides.model.statistics.TestCount;
 import net.thucydides.core.steps.StepEventBus;
-import net.thucydides.core.util.EnvironmentVariables;
+import net.thucydides.model.util.EnvironmentVariables;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.slf4j.Logger;
@@ -23,10 +22,9 @@ public class WebdriverCloseBrowser implements CloseBrowser {
     private final TestCount testCount;
     private final PeriodicRestart shouldRestartBrowser;
 
-    @Inject
     public WebdriverCloseBrowser(EnvironmentVariables environmentVariables) {
         this.environmentVariables = environmentVariables;
-        this.testCount = Injectors.getInjector().getInstance(TestCount.class);
+        this.testCount = SerenityInfrastructure.getTestCount();
         this.shouldRestartBrowser = new PeriodicRestart(environmentVariables);
     }
 

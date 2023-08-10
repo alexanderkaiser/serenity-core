@@ -1,21 +1,24 @@
 package net.thucydides.core.reports.html;
 
-import net.serenitybdd.core.SerenitySystemProperties;
-import net.serenitybdd.core.time.Stopwatch;
+import net.serenitybdd.model.SerenitySystemProperties;
+import net.serenitybdd.model.di.ModelInfrastructure;
+import net.serenitybdd.model.time.Stopwatch;
 import net.serenitybdd.reports.model.DurationDistribution;
 import net.serenitybdd.reports.model.FrequentFailure;
 import net.serenitybdd.reports.model.FrequentFailures;
-import net.thucydides.core.ThucydidesSystemProperty;
-import net.thucydides.core.issues.IssueTracking;
-import net.thucydides.core.model.ReportType;
-import net.thucydides.core.model.TestOutcome;
-import net.thucydides.core.model.TestTag;
+import net.thucydides.model.ThucydidesSystemProperty;
+import net.thucydides.model.issues.IssueTracking;
+import net.thucydides.model.domain.ReportType;
+import net.thucydides.model.domain.TestOutcome;
+import net.thucydides.model.domain.TestTag;
 import net.thucydides.core.reports.*;
-import net.thucydides.core.requirements.DefaultRequirements;
-import net.thucydides.core.requirements.Requirements;
-import net.thucydides.core.requirements.model.RequirementsConfiguration;
-import net.thucydides.core.requirements.reports.RequirementsOutcomes;
-import net.thucydides.core.util.EnvironmentVariables;
+import net.thucydides.model.reports.*;
+import net.thucydides.model.reports.html.ReportNameProvider;
+import net.thucydides.model.requirements.DefaultRequirements;
+import net.thucydides.model.requirements.Requirements;
+import net.thucydides.model.requirements.model.RequirementsConfiguration;
+import net.thucydides.model.requirements.reports.RequirementsOutcomes;
+import net.thucydides.model.util.EnvironmentVariables;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +26,15 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.CopyOption;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static net.thucydides.core.ThucydidesSystemProperty.REPORT_SCOREBOARD_SIZE;
-import static net.thucydides.core.ThucydidesSystemProperty.SERENITY_TEST_ROOT;
-import static net.thucydides.core.guice.Injectors.getInjector;
-import static net.thucydides.core.reports.html.ReportNameProvider.NO_CONTEXT;
+import static net.thucydides.model.ThucydidesSystemProperty.REPORT_SCOREBOARD_SIZE;
+import static net.thucydides.model.ThucydidesSystemProperty.SERENITY_TEST_ROOT;
+import static net.thucydides.model.reports.html.ReportNameProvider.NO_CONTEXT;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -43,9 +46,9 @@ public class HtmlAggregateStoryReporter extends HtmlReporter implements UserStor
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HtmlAggregateStoryReporter.class);
 
-    private String projectName;
+    private final String projectName;
     private String projectDirectory;
-    private String relativeLink;
+    private final String relativeLink;
     private String tags;
     private final IssueTracking issueTracking;
 
@@ -53,7 +56,7 @@ public class HtmlAggregateStoryReporter extends HtmlReporter implements UserStor
     private final ReportNameProvider reportNameProvider;
     private final Requirements requirements;
 
-    private FormatConfiguration formatConfiguration;
+    private final FormatConfiguration formatConfiguration;
     private boolean generateTestOutcomeReports = false;
 
     public static final CopyOption[] COPY_OPTIONS = new CopyOption[]{StandardCopyOption.COPY_ATTRIBUTES};
@@ -65,8 +68,8 @@ public class HtmlAggregateStoryReporter extends HtmlReporter implements UserStor
     public HtmlAggregateStoryReporter(final String projectName, final Requirements requirements) {
         this(projectName,
                 "",
-                getInjector().getInstance(IssueTracking.class),
-                getInjector().getProvider(EnvironmentVariables.class).get(),
+                ModelInfrastructure.getIssueTracking(),
+                ModelInfrastructure.getEnvironmentVariables(),
                 requirements);
 
     }
@@ -74,16 +77,16 @@ public class HtmlAggregateStoryReporter extends HtmlReporter implements UserStor
     public HtmlAggregateStoryReporter(final String projectName, final String relativeLink) {
         this(projectName,
                 relativeLink,
-                getInjector().getInstance(IssueTracking.class),
-                getInjector().getProvider(EnvironmentVariables.class).get());
+                ModelInfrastructure.getIssueTracking(),
+                ModelInfrastructure.getEnvironmentVariables());
     }
 
     public HtmlAggregateStoryReporter(final String projectName,
                                       final IssueTracking issueTracking) {
         this(projectName,
                 "",
-                issueTracking,
-                getInjector().getProvider(EnvironmentVariables.class).get(),
+                ModelInfrastructure.getIssueTracking(),
+                ModelInfrastructure.getEnvironmentVariables(),
                 new DefaultRequirements());
     }
 
@@ -119,6 +122,9 @@ public class HtmlAggregateStoryReporter extends HtmlReporter implements UserStor
 
     public TestOutcomes generateReportsForTestResultsFrom(final File sourceDirectory) throws IOException {
 
+        if (projectDirectory != null) {
+            ModelInfrastructure.getConfiguration().setProjectDirectory(Paths.get(projectDirectory));
+        }
         Stopwatch stopwatch = Stopwatch.started();
         copyScreenshotsFrom(sourceDirectory);
 
@@ -266,7 +272,7 @@ public class HtmlAggregateStoryReporter extends HtmlReporter implements UserStor
     }
 
     private TestOutcomes loadTestOutcomesFrom(File sourceDirectory) throws IOException {
-        return TestOutcomeLoader.loadTestOutcomes().inFormat(getFormat()).from(sourceDirectory);//.withRequirementsTags();
+        return TestOutcomeLoader.loadTestOutcomes().inFormat(getFormat()).from(sourceDirectory).withRequirementsTags();
     }
 
     protected SerenitySystemProperties getSystemProperties() {

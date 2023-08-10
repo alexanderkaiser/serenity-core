@@ -1,16 +1,15 @@
 package net.serenitybdd.plugins.jira.workflow
 
-import net.serenitybdd.plugins.jira.guice.Injectors
-import net.thucydides.core.util.EnvironmentVariables
+import net.thucydides.model.util.EnvironmentVariables
 import spock.lang.Specification
 
 class WhenLoadingTheWorkflow extends Specification {
 
-    def EnvironmentVariables environmentVariables = Mock();
+    EnvironmentVariables environmentVariables = Mock()
 
     def "should look for the jira-workflow.groovy configuration file by default"() {
         when:
-        def workflowLoader = Injectors.getInjector().getInstance(WorkflowLoader)
+        def workflowLoader = new ClasspathWorkflowLoader('jira-workflow.groovy', environmentVariables)
 
         then:
         workflowLoader.defaultWorkflow == 'jira-workflow.groovy'

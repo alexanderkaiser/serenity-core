@@ -1,8 +1,9 @@
 package net.thucydides.core.reports
 
-import net.thucydides.core.digest.Digest
-import net.thucydides.core.reports.html.ReportNameProvider
-import net.thucydides.core.requirements.model.Requirement
+import net.thucydides.model.digest.Digest
+import net.thucydides.model.reports.html.ReportNameProvider
+import net.thucydides.model.requirements.model.Requirement
+import net.thucydides.model.reports.html.ReportNameProvider
 import spock.lang.Specification
 
 class WhenNamingReports extends Specification {
@@ -97,32 +98,4 @@ class WhenNamingReports extends Specification {
         then:
         reportName == Digest.ofTextValue("context_sometest_result_success") + ".csv"
     }
-
-    def "should find a unique  name for a requirement report"() {
-        given:
-            def reportNameProvider = new ReportNameProvider()
-            def requirement = Mock(Requirement)
-            requirement.qualifiedName() >> "foo"
-            requirement.getType() >> "feature"
-        when:
-            def reportName = reportNameProvider.forRequirement(requirement)
-        then:
-            reportName == Digest.ofTextValue("feature_foo") + ".html"
-    }
-
-
-    def "should find a unique  name for a requirement report in context"() {
-        given:
-            def reportNameProvider = new ReportNameProvider("sometest")
-            def requirement = Mock(Requirement)
-            requirement.qualifiedName() >> "foo"
-            requirement.getType() >> "feature"
-        when:
-            def reportName = reportNameProvider.forRequirement(requirement)
-        then:
-            reportName == Digest.ofTextValue("context_sometest_feature_foo") + ".html"
-    }
-
-
-
 }

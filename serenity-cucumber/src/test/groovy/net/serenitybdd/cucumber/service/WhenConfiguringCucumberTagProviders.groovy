@@ -1,11 +1,11 @@
 package net.serenitybdd.cucumber.service
 
-import net.thucydides.core.model.TestOutcome
-import net.thucydides.core.model.TestTag
-import net.thucydides.core.requirements.FileSystemRequirementsTagProvider
-import net.thucydides.core.statistics.service.TagProvider
-import net.thucydides.core.util.EnvironmentVariables
-import net.thucydides.core.environment.MockEnvironmentVariables
+import net.thucydides.model.domain.TestOutcome
+import net.thucydides.model.domain.TestTag
+import net.thucydides.model.requirements.FileSystemRequirementsTagProvider
+import net.thucydides.model.statistics.service.TagProvider
+import net.thucydides.model.util.EnvironmentVariables
+import net.thucydides.model.environment.MockEnvironmentVariables
 import spock.lang.Specification
 /**
  * Created by john on 10/07/2016.
@@ -72,7 +72,7 @@ class WhenConfiguringCucumberTagProviders extends Specification {
             def tags = tagProvider.getTagsFor(testOutcome)
         then:
             System.err.println tags
-            tags.contains(TestTag.withValue("feature:Calculator/More complex Arithmetic")) && tags.contains(TestTag.withValue("capability:Calculator"))
+            tags.contains(TestTag.withValue("feature:calculator/complex_arithmetic")) && tags.contains(TestTag.withValue("capability:Calculator"))
     }
 
 }

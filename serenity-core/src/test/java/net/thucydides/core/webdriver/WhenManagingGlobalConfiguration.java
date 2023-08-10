@@ -1,7 +1,8 @@
 package net.thucydides.core.webdriver;
 
-import net.thucydides.core.configuration.SystemPropertiesConfiguration;
-import net.thucydides.core.environment.MockEnvironmentVariables;
+import net.thucydides.model.configuration.SystemPropertiesConfiguration;
+import net.thucydides.model.environment.MockEnvironmentVariables;
+import net.thucydides.model.webdriver.Configuration;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,7 +32,7 @@ public class WhenManagingGlobalConfiguration {
 
     @Test
     public void the_browser_restart_value_can_be_defined_in_a_system_property() {
-        environmentVariables.setProperty("thucydides.restart.browser.frequency", "5");
+        environmentVariables.setProperty("serenity.restart.browser.frequency", "5");
 
         assertThat(configuration.getRestartFrequency(), is(5));
     }
@@ -45,29 +46,30 @@ public class WhenManagingGlobalConfiguration {
     @Test
     public void the_unique_browser_value_can_be_defined_in_a_system_property() {
         String outputDirectory = changeSeparatorIfRequired("build/reports/thucydides");
-        environmentVariables.setProperty("thucydides.outputDirectory", outputDirectory);
+        environmentVariables.setProperty("serenity.outputDirectory", outputDirectory);
+        configuration = new SystemPropertiesConfiguration(environmentVariables);
 
         assertThat(configuration.getOutputDirectory().getAbsoluteFile().toString(), endsWith(outputDirectory));
     }
 
     @Test
     public void the_output_directory_can_be_defined_in_a_system_property() {
-        environmentVariables.setProperty("thucydides.use.unique.browser", "true");
+        environmentVariables.setProperty("serenity.use.unique.browser", "true");
 
         assertThat(configuration.shouldUseAUniqueBrowser(), is(true));
     }
 
     @Test
     public void system_properties_cannot_be_set_if_defined() {
-        environmentVariables.setProperty("thucydides.use.unique.browser", "true");
-        configuration.setIfUndefined("thucydides.use.unique.browser", "false");
+        environmentVariables.setProperty("serenity.use.unique.browser", "true");
+        configuration.setIfUndefined("serenity.use.unique.browser", "false");
 
         assertThat(configuration.shouldUseAUniqueBrowser(), is(true));
     }
 
     @Test
     public void system_properties_can_be_set_if_undefined() {
-        configuration.setIfUndefined("thucydides.use.unique.browser", "false");
+        configuration.setIfUndefined("serenity.use.unique.browser", "false");
 
         assertThat(configuration.shouldUseAUniqueBrowser(), is(false));
     }

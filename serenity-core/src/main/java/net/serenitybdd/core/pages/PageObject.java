@@ -3,27 +3,28 @@ package net.serenitybdd.core.pages;
 import com.google.common.base.Predicate;
 import net.serenitybdd.core.Serenity;
 import net.serenitybdd.core.SystemTimeouts;
-import net.serenitybdd.core.collect.NewList;
-import net.serenitybdd.core.environment.EnvironmentSpecificConfiguration;
-import net.thucydides.core.ThucydidesSystemProperty;
-import net.thucydides.core.annotations.WhenPageOpens;
-import net.thucydides.core.environment.SystemEnvironmentVariables;
+import net.serenitybdd.model.collect.NewList;
+import net.serenitybdd.core.di.SerenityInfrastructure;
+import net.serenitybdd.model.environment.EnvironmentSpecificConfiguration;
+import net.serenitybdd.model.time.SystemClock;
+import net.thucydides.model.ThucydidesSystemProperty;
+import net.serenitybdd.annotations.WhenPageOpens;
+import net.thucydides.model.environment.SystemEnvironmentVariables;
 import net.thucydides.core.fluent.ThucydidesFluentAdapter;
-import net.thucydides.core.guice.Injectors;
 import net.thucydides.core.pages.Pages;
 import net.thucydides.core.pages.WrongPageError;
 import net.thucydides.core.pages.components.Dropdown;
 import net.thucydides.core.pages.components.FileToUpload;
 import net.thucydides.core.pages.jquery.JQueryEnabledPage;
-import net.thucydides.core.reflection.MethodFinder;
+import net.thucydides.model.reflection.MethodFinder;
 import net.thucydides.core.scheduling.FluentWaitWithRefresh;
 import net.thucydides.core.scheduling.SerenityFluentWait;
 import net.thucydides.core.scheduling.ThucydidesFluentWait;
 import net.thucydides.core.steps.PageObjectStepDelayer;
 import net.thucydides.core.steps.StepEventBus;
 import net.thucydides.core.steps.WaitForBuilder;
-import net.thucydides.core.util.EnvironmentVariables;
-import net.thucydides.core.util.Inflector;
+import net.thucydides.model.util.EnvironmentVariables;
+import net.thucydides.model.util.Inflector;
 import net.thucydides.core.webdriver.*;
 import net.thucydides.core.webdriver.javascript.JavascriptExecutorFacade;
 import net.thucydides.core.webelements.Checkbox;
@@ -57,10 +58,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static net.serenitybdd.core.pages.ParameterisedLocator.withArguments;
 import static net.serenitybdd.core.selectors.Selectors.xpathOrCssSelector;
-import static net.thucydides.core.ThucydidesSystemProperty.*;
+import static net.thucydides.model.ThucydidesSystemProperty.*;
 import static net.thucydides.core.webdriver.javascript.JavascriptSupport.javascriptIsSupportedIn;
 
 /**
@@ -84,7 +84,7 @@ public abstract class PageObject {
 
     private PageUrls pageUrls;
 
-    private final net.serenitybdd.core.time.SystemClock clock;
+    private final SystemClock clock;
 
     private Duration waitForTimeout;
     private Duration waitForElementTimeout;
@@ -109,7 +109,7 @@ public abstract class PageObject {
         if (driver instanceof ConfigurableTimeouts) {
             ((ConfigurableTimeouts) driver).setImplicitTimeout(implicitTimeout);
         } else {
-            driver.manage().timeouts().implicitlyWait(implicitTimeout.toMillis(), MILLISECONDS);
+            driver.manage().timeouts().implicitlyWait(Duration.ofMillis(waitForElementTimeout.toMillis()));
         }
     }
 
@@ -118,7 +118,7 @@ public abstract class PageObject {
             waitForElementTimeout = ((ConfigurableTimeouts) driver).resetTimeouts();
         } else {
             waitForElementTimeout = getDefaultImplicitTimeout();
-            driver.manage().timeouts().implicitlyWait(waitForElementTimeout.toMillis(), MILLISECONDS);
+            driver.manage().timeouts().implicitlyWait(Duration.ofMillis(waitForElementTimeout.toMillis()));
         }
     }
 
@@ -134,7 +134,7 @@ public abstract class PageObject {
 
     protected PageObject() {
         this.webdriverClock = Clock.systemDefaultZone();
-        this.clock = Injectors.getInjector().getInstance(net.serenitybdd.core.time.SystemClock.class);
+        this.clock = SerenityInfrastructure.getClock();
         this.environmentVariables = SystemEnvironmentVariables.currentEnvironmentVariables();
         this.sleeper = Sleeper.SYSTEM_SLEEPER;
     }
@@ -274,7 +274,7 @@ public abstract class PageObject {
         return renderedView;
     }
 
-    protected net.serenitybdd.core.time.SystemClock getClock() {
+    protected SystemClock getClock() {
         return clock;
     }
 
@@ -1258,9 +1258,7 @@ public abstract class PageObject {
 
     private <T> List<T> allButLastIn(T[] selectors) {
         List<T> subList = new ArrayList<>();
-        for (int i = 0; i < selectors.length - 1; i++) {
-            subList.add(selectors[i]);
-        }
+        subList.addAll(Arrays.asList(selectors).subList(0, selectors.length - 1));
         return subList;
     }
 

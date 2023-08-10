@@ -1,25 +1,25 @@
 package net.serenitybdd.junit.runners.integration;
 
+import net.serenitybdd.core.di.SerenityInfrastructure;
 import net.serenitybdd.junit.runners.ParameterizedTestsOutcomeAggregator;
 import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.serenitybdd.junit.runners.SerenityRunner;
-import net.thucydides.core.ThucydidesSystemProperty;
-import net.thucydides.core.annotations.Managed;
-import net.thucydides.core.annotations.ManagedPages;
-import net.thucydides.core.annotations.Steps;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.batches.BatchManager;
-import net.thucydides.core.batches.BatchManagerProvider;
-import net.thucydides.core.configuration.SystemPropertiesConfiguration;
+import net.thucydides.model.ThucydidesSystemProperty;
+import net.serenitybdd.annotations.Managed;
+import net.serenitybdd.annotations.ManagedPages;
+import net.serenitybdd.annotations.Steps;
+import net.serenitybdd.annotations.WithTag;
+import net.thucydides.model.batches.BatchManager;
+import net.thucydides.model.configuration.SystemPropertiesConfiguration;
 import net.thucydides.core.configuration.WebDriverConfiguration;
-import net.thucydides.core.model.TestOutcome;
-import net.thucydides.core.model.TestResult;
-import net.thucydides.core.model.TestStep;
+import net.thucydides.model.domain.TestOutcome;
+import net.thucydides.model.domain.TestResult;
+import net.thucydides.model.domain.TestStep;
 import net.thucydides.core.pages.Pages;
 import net.thucydides.core.steps.stepdata.StepData;
-import net.thucydides.core.util.EnvironmentVariables;
-import net.thucydides.core.environment.MockEnvironmentVariables;
-import net.thucydides.core.webdriver.Configuration;
+import net.thucydides.model.util.EnvironmentVariables;
+import net.thucydides.model.environment.MockEnvironmentVariables;
+import net.thucydides.model.webdriver.Configuration;
 import net.thucydides.core.webdriver.DriverConfiguration;
 import net.thucydides.core.webdriver.WebDriverFactory;
 import net.thucydides.junit.annotations.Concurrent;
@@ -45,7 +45,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -228,7 +227,7 @@ public class WhenRunningADataDrivenTestScenario {
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
         outputDirectory.deleteOnExit();
 
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityParameterizedRunner runner = getTestRunnerUsing(SampleDataDrivenScenario.class);
@@ -244,7 +243,7 @@ public class WhenRunningADataDrivenTestScenario {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
         outputDirectory.deleteOnExit();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityParameterizedRunner runner = getTestRunnerUsing(SampleCSVDataDrivenScenario.class);
@@ -260,7 +259,7 @@ public class WhenRunningADataDrivenTestScenario {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
         outputDirectory.deleteOnExit();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityParameterizedRunner runner = getTestRunnerUsing(SampleCSVDataDrivenScenario.class);
@@ -302,7 +301,7 @@ public class WhenRunningADataDrivenTestScenario {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
         outputDirectory.deleteOnExit();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityRunner runner = getNormalTestRunnerUsing(SamplePassingScenarioWithTestSpecificData.class);
@@ -318,7 +317,7 @@ public class WhenRunningADataDrivenTestScenario {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
         outputDirectory.deleteOnExit();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityRunner runner = getNormalTestRunnerUsing(ScenarioWithTestSpecificDataAndAFailingTestSample.class);
@@ -338,7 +337,7 @@ public class WhenRunningADataDrivenTestScenario {
     public void when_a_step_is_skipped_for_a_row_the_other_rows_should_be_executed() throws Throwable {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityRunner runner = getNormalTestRunnerUsing(ScenarioWithTestSpecificDataAndAFailingTestSample.class);
@@ -359,7 +358,7 @@ public class WhenRunningADataDrivenTestScenario {
     public void browser_should_be_restarted_periodically_if_requested() throws Throwable {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(), outputDirectory.getAbsolutePath());
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(), outputDirectory.getAbsolutePath());
         environmentVariables.setProperty("thucydides.restart.browser.frequency", "5");
 
         SerenityParameterizedRunner runner = getTestRunnerUsing(SampleSingleSessionDataDrivenScenario.class);
@@ -372,7 +371,7 @@ public class WhenRunningADataDrivenTestScenario {
     public void when_a_step_fails_for_a_row_the_other_rows_should_not_be_skipped() throws Throwable {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityRunner runner = getNormalTestRunnerUsing(ScenarioWithTestSpecificDataAndAFailingTestSample.class);
@@ -394,7 +393,7 @@ public class WhenRunningADataDrivenTestScenario {
     public void when_a_parameterized_test_fails_outside_a_step_a_failure_should_be_recorded() throws Throwable {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityParameterizedRunner runner = getTestRunnerUsing(SampleDataDrivenScenarioWithExternalFailure.class);
@@ -412,7 +411,7 @@ public class WhenRunningADataDrivenTestScenario {
     public void when_a_step_fails_with_an_error_for_a_row_the_other_rows_should_be_executed() throws Throwable {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityRunner runner = getNormalTestRunnerUsing(ScenarioWithTestSpecificDataAndABreakingTestSample.class);
@@ -549,7 +548,7 @@ public class WhenRunningADataDrivenTestScenario {
     public void when_test_data_is_provided_for_a_step_then_a_step_should_be_reported_for_each_data_row() throws Throwable {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityRunner runner = getNormalTestRunnerUsing(ScenarioWithTestSpecificDataSample.class);
@@ -569,7 +568,7 @@ public class WhenRunningADataDrivenTestScenario {
     public void when_test_data_is_provided_for_a_nested_step_then_a_step_should_be_reported_for_each_data_row() throws Throwable {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityRunner runner = getNormalTestRunnerUsing(ScenarioWithNestedTestSpecificDataSample.class);
@@ -589,7 +588,7 @@ public class WhenRunningADataDrivenTestScenario {
     public void when_test_data_is_provided_for_a_deeply_nested_step_then_a_step_should_be_reported_for_each_data_row() throws Throwable {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityRunner runner = getNormalTestRunnerUsing(ScenarioWithDeeplyNestedTestSpecificDataSample.class);
@@ -609,7 +608,7 @@ public class WhenRunningADataDrivenTestScenario {
     public void test_step_data_should_appear_in_the_step_titles() throws Throwable {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityRunner runner = getNormalTestRunnerUsing(ScenarioWithTestSpecificDataSample.class);
@@ -636,7 +635,7 @@ public class WhenRunningADataDrivenTestScenario {
     public void running_a_simple_parameterized_test_should_produce_an_outcome_per_data_row() throws Throwable {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityParameterizedRunner runner = getTestRunnerUsing(SimpleSuccessfulParametrizedTestSample.class);
@@ -653,7 +652,7 @@ public class WhenRunningADataDrivenTestScenario {
     public void when_the_Concurrent_annotation_is_used_tests_should_be_run_in_parallel() throws Throwable {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityParameterizedRunner runner = getTestRunnerUsing(SampleParallelDataDrivenScenario.class);
@@ -694,7 +693,7 @@ public class WhenRunningADataDrivenTestScenario {
     public static final class ParallelDataDrivenScenarioWithSpecifiedThreadCountSample {
         @TestData
         public static Collection testData() {
-            return Arrays.asList(new Object[][]{});
+            return List.of();
         }
         @Test
         public void foo() {
@@ -730,7 +729,7 @@ public class WhenRunningADataDrivenTestScenario {
     public static final class ParallelDataDrivenScenarioWithRelativeThreadCountSample {
         @TestData
         public static Collection testData() {
-            return Arrays.asList(new Object[][]{});
+            return List.of();
         }
 
         @Test
@@ -756,7 +755,7 @@ public class WhenRunningADataDrivenTestScenario {
     public static final class ParallelDataDrivenScenarioWithInvalidThreadCountSample {
         @TestData
         public static Collection testData() {
-            return Arrays.asList(new Object[][]{});
+            return List.of();
         }
 
         @Test
@@ -802,15 +801,15 @@ public class WhenRunningADataDrivenTestScenario {
     public void a_separate_html_report_should_be_generated_from_each_scenario() throws Throwable {
 
         File outputDirectory = Files.createTempDirectory("tmp").toFile();
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityParameterizedRunner runner = getTestRunnerUsing(SampleDataDrivenScenario.class);
 
         runner.run(new RunNotifier());
 
-        File[] reports = reload(outputDirectory).listFiles(new HTMLFileFilter());
-        assertThat(reports.length, is(3));
+        File[] jsonReports = reload(outputDirectory).listFiles(new JSONFileFilter());
+        assertThat(jsonReports.length, is(3));
     }
 
     private class HTMLFileFilter implements FilenameFilter {
@@ -838,14 +837,14 @@ public class WhenRunningADataDrivenTestScenario {
     protected SerenityParameterizedRunner getTestRunnerUsing(Class<?> testClass, EnvironmentVariables environmentVariables) throws Throwable {
         DriverConfiguration configuration = new WebDriverConfiguration(environmentVariables);
         WebDriverFactory factory = new WebDriverFactory(environmentVariables);
-        BatchManager batchManager = new BatchManagerProvider(configuration).get();
+        BatchManager batchManager = SerenityInfrastructure.getBatchManager();
         return new SerenityParameterizedRunner(testClass, configuration, factory, batchManager);
     }
 
     protected SerenityParameterizedRunner getStubbedTestRunnerUsing(Class<?> testClass) throws Throwable {
         DriverConfiguration configuration = new WebDriverConfiguration(environmentVariables);
         WebDriverFactory factory = new WebDriverFactory(environmentVariables);
-        BatchManager batchManager = new BatchManagerProvider(configuration).get();
+        BatchManager batchManager = SerenityInfrastructure.getBatchManager();
         return new SerenityParameterizedRunner(testClass, configuration, factory, batchManager) {
             @Override
             public void generateReports() {

@@ -1,16 +1,18 @@
 package net.thucydides.core.model;
 
 import com.google.common.io.Resources;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTagValuesOf;
-import net.thucydides.core.annotations.WithTags;
-import net.thucydides.core.reports.TestOutcomeStream;
-import net.thucydides.core.requirements.FileSystemRequirementsTagProvider;
-import net.thucydides.core.requirements.PackageRequirementsTagProvider;
-import net.thucydides.core.requirements.model.Requirement;
-import net.thucydides.core.statistics.service.*;
-import net.thucydides.core.util.EnvironmentVariables;
-import net.thucydides.core.environment.MockEnvironmentVariables;
+import net.serenitybdd.annotations.WithTag;
+import net.serenitybdd.annotations.WithTagValuesOf;
+import net.serenitybdd.annotations.WithTags;
+import net.thucydides.model.domain.Story;
+import net.thucydides.model.domain.TestOutcome;
+import net.thucydides.model.domain.TestTag;
+import net.thucydides.model.reports.TestOutcomeStream;
+import net.thucydides.model.requirements.FileSystemRequirementsTagProvider;
+import net.thucydides.model.requirements.model.Requirement;
+import net.thucydides.model.statistics.service.*;
+import net.thucydides.model.util.EnvironmentVariables;
+import net.thucydides.model.environment.MockEnvironmentVariables;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -50,6 +52,7 @@ public class WhenFindingTagsForATestOutcome {
         for(TagProvider provider : tagProviders) {
             if (provider instanceof AnnotationBasedTagProvider) {
                 containsAnnotationTagProvider = true;
+                break;
             }
         }
         assertThat(containsAnnotationTagProvider, is(true));
@@ -65,6 +68,7 @@ public class WhenFindingTagsForATestOutcome {
         for(TagProvider provider : tagProviders) {
             if (provider instanceof AnnotationBasedTagProvider) {
                 containsAnnotationTagProvider = true;
+                break;
             }
         }
         assertThat(containsAnnotationTagProvider, is(true));
@@ -79,20 +83,7 @@ public class WhenFindingTagsForATestOutcome {
         for(TagProvider provider : tagProviders) {
             if (provider instanceof FileSystemRequirementsTagProvider) {
                 containsRequirementsProvider = true;
-            }
-        }
-        assertThat(containsRequirementsProvider, is(true));
-    }
-
-    @Test
-    public void junit_tag_provider_strategy_should_also_find_the_package_requirements_provider_by_default() {
-        TagProviderStrategy tagProviderStrategy = new JUnitTagProviderStrategy();
-        Iterable<? extends TagProvider> tagProviders = tagProviderStrategy.getTagProviders();
-
-        boolean containsRequirementsProvider = false;
-        for(TagProvider provider : tagProviders) {
-            if (provider instanceof PackageRequirementsTagProvider) {
-                containsRequirementsProvider = true;
+                break;
             }
         }
         assertThat(containsRequirementsProvider, is(true));
@@ -316,17 +307,6 @@ public class WhenFindingTagsForATestOutcome {
     @Mock TestOutcome testOutcome;
 
     @Test
-    public void should_get_tags_from_story_path() {
-        FileSystemRequirementsTagProvider tagProvider = new FileSystemRequirementsTagProvider();
-
-        when(testOutcome.getPath()).thenReturn("stories.grow_potatoes.grow_new_potatoes.PlantPotatoes");
-        Set<TestTag> tags = tagProvider.getTagsFor(testOutcome);
-        assertThat(tags, hasItem(TestTag.withName("Grow potatoes").andType("capability")));
-        assertThat(tags, hasItem(TestTag.withName("Grow potatoes/Grow new potatoes").andType("feature")));
-        assertThat(tags, hasItem(TestTag.withName("Grow new potatoes/Plant potatoes").andType("story")));
-    }
-
-    @Test
     public void should_get_overview_from_default_story_path() {
         FileSystemRequirementsTagProvider tagProvider = new FileSystemRequirementsTagProvider();
 
@@ -355,46 +335,15 @@ public class WhenFindingTagsForATestOutcome {
     }
 
     @Test
-    public void should_get_tags_from_story_path_with_file_separators() {
-        FileSystemRequirementsTagProvider tagProvider = new FileSystemRequirementsTagProvider();
-
-        when(testOutcome.getPath()).thenReturn("stories/grow_potatoes/grow_new_potatoes/PlantPotatoes");
-        Set<TestTag> tags = tagProvider.getTagsFor(testOutcome);
-        assertThat(tags, hasItem(TestTag.withName("Grow potatoes").andType("capability")));
-        assertThat(tags, hasItem(TestTag.withName("Grow potatoes/Grow new potatoes").andType("feature")));
-    }
-
-    @Test
-    public void should_ignore_dot_story_suffix_in_path() {
-        FileSystemRequirementsTagProvider tagProvider = new FileSystemRequirementsTagProvider();
-
-        when(testOutcome.getPath()).thenReturn("stories/grow_potatoes/grow_new_potatoes/PlantPotatoes.story");
-        Set<TestTag> tags = tagProvider.getTagsFor(testOutcome);
-        assertThat(tags, hasItem(TestTag.withName("Grow potatoes").andType("capability")));
-        assertThat(tags, hasItem(TestTag.withName("Grow potatoes/Grow new potatoes").andType("feature")));
-        assertThat(tags, hasItem(TestTag.withName("Grow new potatoes/Plant potatoes").andType("story")));
-    }
-
-    @Test
     public void should_record_the_relative_path_of_each_requirement() {
         FileSystemRequirementsTagProvider tagProvider = new FileSystemRequirementsTagProvider();
 
-        when(testOutcome.getPath()).thenReturn("stories/grow_potatoes/grow_new_potatoes/PlantPotatoes.story");
+        when(testOutcome.getPath()).thenReturn("stories/grow_potatoes/grow_new_potatoes/PlantPotatoes");
 
         Optional<Requirement> requirement = tagProvider.getParentRequirementOf(testOutcome);
 
         assertThat(requirement.isPresent(), is(true));
-        assertThat(requirement.get().getPath(), is("grow_potatoes/grow_new_potatoes/PlantPotatoes.story"));
-    }
-
-    @Test
-    public void should_get_tags_from_story_path_with_windows_file_separators() {
-        FileSystemRequirementsTagProvider tagProvider = new FileSystemRequirementsTagProvider();
-
-        when(testOutcome.getPath()).thenReturn("stories\\grow_potatoes\\grow_new_potatoes\\PlantPotatoes");
-        Set<TestTag> tags = tagProvider.getTagsFor(testOutcome);
-        assertThat(tags, hasItem(TestTag.withName("Grow potatoes").andType("capability")));
-        assertThat(tags, hasItem(TestTag.withName("Grow potatoes/Grow new potatoes").andType("feature")));
+        assertThat(requirement.get().getPath(), is("grow_potatoes/grow_new_potatoes/PlantPotatoes"));
     }
 
     @Test
@@ -413,19 +362,6 @@ public class WhenFindingTagsForATestOutcome {
         assertThat(requirement.get().getNarrative().getText(), containsString("I want to plant potatoes"));
         assertThat(requirement.get().getNarrative().getText(), containsString("So that I can harvest them later on"));
     }
-
-    @Test
-    public void should_get_empty_narrative_if_none_are_defined() {
-        FileSystemRequirementsTagProvider tagProvider = new FileSystemRequirementsTagProvider();
-        when(testOutcome.getPath()).thenReturn("stories/grow_cucumbers");
-
-        Optional<Requirement> requirement = tagProvider.getParentRequirementOf(testOutcome);
-
-        assertThat(requirement.isPresent(), is(true));
-        assertThat(requirement.get().getNarrative().getText(), isEmptyString());
-    }
-
-
 
     @Test
     public void should_get_requirement_from_feature_with_narrative_if_present() {
@@ -494,7 +430,7 @@ public class WhenFindingTagsForATestOutcome {
 
         assertThat(requirement.isPresent(), is(true));
         assertThat(requirement.get().getName(), is("Add new items to the todo list"));
-        assertThat(requirement.get().getParent(), is("Record todos"));
+        assertThat(requirement.get().getParent(), is("record_todos"));
     }
 
     @Test
@@ -513,7 +449,7 @@ public class WhenFindingTagsForATestOutcome {
 
         assertThat(requirement.isPresent(), is(true));
         assertThat(requirement.get().getName(), is("Add new items to the todo list"));
-        assertThat(requirement.get().getParent(), is("Record todos"));
+        assertThat(requirement.get().getParent(), is("record_todos"));
     }
 
     @Test

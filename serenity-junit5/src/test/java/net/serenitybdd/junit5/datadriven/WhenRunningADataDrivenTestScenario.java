@@ -3,15 +3,15 @@ package net.serenitybdd.junit5.datadriven;
 import net.serenitybdd.junit5.AbstractTestStepRunnerTest;
 import net.serenitybdd.junit5.ParameterizedTestsOutcomeAggregator;
 import net.serenitybdd.junit5.datadriven.samples.*;
-import net.thucydides.core.ThucydidesSystemProperty;
-import net.thucydides.core.configuration.SystemPropertiesConfiguration;
-import net.thucydides.core.model.TestOutcome;
-import net.thucydides.core.model.TestResult;
-import net.thucydides.core.model.TestStep;
+import net.thucydides.model.ThucydidesSystemProperty;
+import net.thucydides.model.configuration.SystemPropertiesConfiguration;
+import net.thucydides.model.domain.TestOutcome;
+import net.thucydides.model.domain.TestResult;
+import net.thucydides.model.domain.TestStep;
 import net.thucydides.core.steps.StepEventBus;
-import net.thucydides.core.environment.MockEnvironmentVariables;
-import net.thucydides.core.environment.SystemEnvironmentVariables;
-import net.thucydides.core.webdriver.Configuration;
+import net.thucydides.model.environment.MockEnvironmentVariables;
+import net.thucydides.model.environment.SystemEnvironmentVariables;
+import net.thucydides.model.webdriver.Configuration;
 import net.thucydides.core.webdriver.WebDriverFactory;
 import net.thucydides.samples.AddDifferentSortsOfTodos;
 import org.apache.commons.io.FileUtils;
@@ -88,13 +88,6 @@ public class WhenRunningADataDrivenTestScenario extends AbstractTestStepRunnerTe
         stickyEventBuses.forEach((k,v)->System.out.println(k + "--" + v) );
 
         assertTrue(StepEventBus.getStickyEventBuses().size()==0);*/
-    }
-
-    private void runTestForClass(Class testClass){
-        LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
-                .selectors(selectClass(testClass))
-                .build();
-        LauncherFactory.create().execute(request);
     }
 
     @Test
@@ -595,7 +588,7 @@ public class WhenRunningADataDrivenTestScenario extends AbstractTestStepRunnerTe
     public void when_test_data_is_provided_for_a_step_a_single_test_should_be_executed() {
 
         File outputDirectory = tempFolder.newFolder("thucydides");
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityRunner runner = getNormalTestRunnerUsing(SamplePassingScenarioWithTestSpecificData.class);
@@ -611,7 +604,7 @@ public class WhenRunningADataDrivenTestScenario extends AbstractTestStepRunnerTe
     public void browser_should_be_restarted_periodically_if_requested() {
 
         File outputDirectory = tempFolder.newFolder("thucydides");
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(), outputDirectory.getAbsolutePath());
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(), outputDirectory.getAbsolutePath());
         environmentVariables.setProperty("thucydides.restart.browser.frequency", "5");
 
         SerenityParameterizedRunner runner = getTestRunnerUsing(SampleSingleSessionDataDrivenScenario.class);
@@ -645,7 +638,7 @@ public class WhenRunningADataDrivenTestScenario extends AbstractTestStepRunnerTe
     public void when_test_data_is_provided_for_a_deeply_nested_step_then_a_step_should_be_reported_for_each_data_row() {
 
         File outputDirectory = tempFolder.newFolder("thucydides");
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityRunner runner = getNormalTestRunnerUsing(ScenarioWithDeeplyNestedTestSpecificDataSample.class);
@@ -666,7 +659,7 @@ public class WhenRunningADataDrivenTestScenario extends AbstractTestStepRunnerTe
     public void when_the_Concurrent_annotation_is_used_tests_should_be_run_in_parallel() {
 
         File outputDirectory = tempFolder.newFolder("thucydides");
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityParameterizedRunner runner = getTestRunnerUsing(SampleParallelDataDrivenScenario.class);
@@ -815,7 +808,7 @@ public class WhenRunningADataDrivenTestScenario extends AbstractTestStepRunnerTe
     public void a_separate_html_report_should_be_generated_from_each_scenario() {
 
         File outputDirectory = tempFolder.newFolder("thucydides");
-        environmentVariables.setProperty(ThucydidesSystemProperty.THUCYDIDES_OUTPUT_DIRECTORY.getPropertyName(),
+        environmentVariables.setProperty(ThucydidesSystemProperty.SERENITY_OUTPUT_DIRECTORY.getPropertyName(),
                 outputDirectory.getAbsolutePath());
 
         SerenityParameterizedRunner runner = getTestRunnerUsing(SampleDataDrivenScenario.class);

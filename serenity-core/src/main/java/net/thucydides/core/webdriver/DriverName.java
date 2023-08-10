@@ -1,7 +1,7 @@
 package net.thucydides.core.webdriver;
 
-import net.thucydides.core.ThucydidesSystemProperty;
-import net.thucydides.core.util.EnvironmentVariables;
+import net.thucydides.model.ThucydidesSystemProperty;
+import net.thucydides.model.util.EnvironmentVariables;
 import org.apache.commons.lang3.StringUtils;
 
 public class DriverName {
@@ -28,6 +28,6 @@ public class DriverName {
     }
 
     private Boolean differentBrowserForEachActor() {
-        return ThucydidesSystemProperty.THUCYDIDES_DIFFERENT_BROWSER_FOR_EACH_ACTOR.booleanFrom(environmentVariables, true);
+        return ThucydidesSystemProperty.SERENITY_DIFFERENT_BROWSER_FOR_EACH_ACTOR.booleanFrom(environmentVariables, true);
     }
 }

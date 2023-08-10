@@ -6,8 +6,8 @@ import net.serenitybdd.screenplay.abilities.BrowseTheWeb;
 import net.serenitybdd.screenplay.webtests.questions.ContactPreferences;
 import net.serenitybdd.screenplay.webtests.questions.CountryQuestion;
 import net.serenitybdd.screenplay.webtests.tasks.*;
-import net.thucydides.core.annotations.Managed;
-import net.thucydides.core.annotations.Steps;
+import net.serenitybdd.annotations.Managed;
+import net.serenitybdd.annotations.Steps;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.hasItems;
 @RunWith(SerenityRunner.class)
 public class WhenDinaSelectsHerContactPreferences {
 
-    @Managed(driver = "firefox", options="--headless")
+    @Managed(driver = "chrome", options="--headless")
     WebDriver firstBrowser;
 
     @Test

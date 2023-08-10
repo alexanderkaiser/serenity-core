@@ -1,23 +1,27 @@
 package net.thucydides.core.steps;
 
 import com.google.common.base.Preconditions;
-import com.google.inject.Inject;
+
 import io.cucumber.core.resource.ClassLoaders;
 import net.serenitybdd.core.Serenity;
-import net.serenitybdd.core.collect.NewList;
-import net.serenitybdd.core.environment.ConfiguredEnvironment;
+import net.serenitybdd.model.collect.NewList;
+import net.serenitybdd.model.environment.ConfiguredEnvironment;
 import net.serenitybdd.core.eventbus.Broadcaster;
 import net.serenitybdd.core.parallel.Agency;
 import net.serenitybdd.core.parallel.Agent;
-import net.thucydides.core.ThucydidesSystemProperty;
-import net.thucydides.core.environment.SystemEnvironmentVariables;
-import net.thucydides.core.environment.TestLocalEnvironmentVariables;
+import net.thucydides.model.ThucydidesSystemProperty;
+import net.thucydides.model.domain.*;
+import net.thucydides.model.environment.SystemEnvironmentVariables;
+import net.thucydides.model.environment.TestLocalEnvironmentVariables;
 import net.thucydides.core.events.TestLifecycleEvents;
-import net.thucydides.core.model.*;
-import net.thucydides.core.screenshots.ScreenshotAndHtmlSource;
+import net.thucydides.model.screenshots.ScreenshotAndHtmlSource;
 import net.thucydides.core.steps.session.TestSession;
-import net.thucydides.core.util.EnvironmentVariables;
-import net.thucydides.core.webdriver.Configuration;
+import net.thucydides.model.steps.ExecutedStepDescription;
+import net.thucydides.model.steps.StepFailure;
+import net.thucydides.model.steps.StepListener;
+import net.thucydides.model.steps.TestFailureCause;
+import net.thucydides.model.util.EnvironmentVariables;
+import net.thucydides.model.webdriver.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +34,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;
-import static net.thucydides.core.ThucydidesSystemProperty.SERENITY_ENABLE_WEBDRIVER_IN_FIXTURE_METHODS;
+import static net.thucydides.model.ThucydidesSystemProperty.SERENITY_ENABLE_WEBDRIVER_IN_FIXTURE_METHODS;
 
 /**
  * An event bus for Step-related notifications.
@@ -55,11 +59,11 @@ public class StepEventBus {
 
     private static boolean noCleanupForStickyBuses = false;
 
-    private static String JUNIT_CONFIG_FILE_NAME = "junit-platform.properties";
+    private static final String JUNIT_CONFIG_FILE_NAME = "junit-platform.properties";
 
     private static boolean jUnit5ParallelMode = false;
 
-    private Map<Class<?>, String> testCaseDisplayNames = new HashMap<>();
+    private final Map<Class<?>, String> testCaseDisplayNames = new HashMap<>();
 
     static {
         jUnit5ParallelMode =  isJUnit5ParallelMode();
@@ -130,8 +134,8 @@ public class StepEventBus {
 
     private TestResultTally resultTally;
 
-    private Stack<String> stepStack = new Stack<>();
-    private Stack<Boolean> webdriverSuspensions = new Stack<>();
+    private final Stack<String> stepStack = new Stack<>();
+    private final Stack<Boolean> webdriverSuspensions = new Stack<>();
 
     private Set<StepListener> customListeners;
 
@@ -149,11 +153,21 @@ public class StepEventBus {
     private final CleanupMethodLocator cleanupMethodLocator;
     private final File outputDirectory;
 
-    @Inject
+    
     public StepEventBus(EnvironmentVariables environmentVariables, Configuration configuration) {
         this.environmentVariables = environmentVariables;
         this.cleanupMethodLocator = new CleanupMethodLocator();
         this.outputDirectory = configuration.getOutputDirectory();
+    }
+
+    /**
+     * Method used for testing purposes to find an event bus for a given test.
+     */
+    public static Optional<StepEventBus> eventBusForTest(String testName) {
+        return STICKY_EVENT_BUSES.keySet().stream()
+                .filter(key -> key.toString().contains(testName))
+                .map(STICKY_EVENT_BUSES::get)
+                .findFirst();
     }
 
 
@@ -231,6 +245,14 @@ public class StepEventBus {
         TestLifecycleEvents.postEvent(TestLifecycleEvents.testStarted());
     }
 
+    public void testStarted(final String testName, ZonedDateTime startTime) {
+        clear();
+        for (StepListener stepListener : getAllListeners()) {
+            stepListener.testStarted(testName, startTime);
+        }
+        TestLifecycleEvents.postEvent(TestLifecycleEvents.testStarted());
+    }
+
     public void testStarted(final String testName, final String id, ZonedDateTime startTime) {
         clear();
         for (StepListener stepListener : getAllListeners()) {
@@ -304,7 +326,7 @@ public class StepEventBus {
     private Set<StepListener> getCustomListeners() {
 
         if (customListeners == null) {
-            customListeners = Collections.synchronizedSet(new HashSet<StepListener>());
+            customListeners = Collections.synchronizedSet(new HashSet<>());
 
             ServiceLoader<StepListener> stepListenerServiceLoader = ServiceLoader.load(StepListener.class);
             Iterator<StepListener> listenerImplementations = stepListenerServiceLoader.iterator();
@@ -392,6 +414,8 @@ public class StepEventBus {
         resultTally = null;
         classUnderTest = null;
         webdriverSuspensions.clear();
+        isDryRun = Optional.empty();
+        suspendedTest = false;
 
         Broadcaster.unregisterAllListeners();
         dropClosableListeners();
@@ -448,7 +472,7 @@ public class StepEventBus {
 
         TestLifecycleEvents.postEvent(TestLifecycleEvents.testFinished());
 
-        SystemEnvironmentVariables.currentEnvironmentVariables().reset();
+        SystemEnvironmentVariables.currentEnvironment().reset();
         TestLocalEnvironmentVariables.clear();
         clear();
     }
@@ -521,18 +545,24 @@ public class StepEventBus {
      * Start the execution of a test step.
      */
     public void stepStarted(final ExecutedStepDescription stepDescription) {
-        stepStarted(stepDescription, false);
+        stepStarted(stepDescription, false, ZonedDateTime.now());
+    }
+
+    public void stepStarted(final ExecutedStepDescription stepDescription, ZonedDateTime startTime) {
+        stepStarted(stepDescription, false, startTime);
     }
 
     /**
      * Start the execution of a test step.
      */
-    public void stepStarted(final ExecutedStepDescription stepDescription, boolean isPrecondition) {
+    public void stepStarted(final ExecutedStepDescription stepDescription,
+                            boolean isPrecondition,
+                            ZonedDateTime startTime) {
 
         pushStep(stepDescription.getName());
 
         for (StepListener stepListener : getAllListeners()) {
-            stepListener.stepStarted(stepDescription);
+            stepListener.stepStarted(stepDescription, startTime);
         }
 
         if (isPrecondition) {
@@ -564,11 +594,11 @@ public class StepEventBus {
      * Called from serial replay - StepFinishedEvent
      * @param screenshots - screenshots that were recorded when the step was finished
      */
-    public void stepFinished(List<ScreenshotAndHtmlSource> screenshots) {
+    public void stepFinished(List<ScreenshotAndHtmlSource> screenshots, ZonedDateTime time) {
         stepDone();
         getResultTally().logExecutedTest();
         for (StepListener stepListener : getAllListeners()) {
-            stepListener.stepFinished(screenshots);
+            stepListener.stepFinished(screenshots, time);
         }
     }
 
@@ -588,6 +618,18 @@ public class StepEventBus {
         }
         stepFailed = true;
     }
+
+    public void stepFailed(final StepFailure failure, List<ScreenshotAndHtmlSource> screenshotList) {
+
+        stepDone();
+        getResultTally().logFailure(failure);
+
+        for (StepListener stepListener : getAllListeners()) {
+            stepListener.stepFailed(failure,screenshotList);
+        }
+        stepFailed = true;
+    }
+
 
     public void lastStepFailed(final StepFailure failure) {
 
@@ -683,6 +725,12 @@ public class StepEventBus {
 
     public void temporarilySuspendWebdriverCalls() {
         webdriverSuspensions.push(true);
+    }
+
+    public void testFailed(final Throwable cause, ZonedDateTime timestamp) {
+        TestOutcome outcome = getBaseStepListener().getCurrentTestOutcome();
+        outcome.recordDuration(timestamp);
+        testFailed(cause);
     }
 
     /**
@@ -865,9 +913,21 @@ public class StepEventBus {
         }
     }
 
+    public void exampleStarted(Map<String, String> data, ZonedDateTime time) {
+        for (StepListener stepListener : getAllListeners()) {
+            stepListener.exampleStarted(data, time);
+        }
+    }
+
     public void exampleStarted(Map<String, String> data, String exampleName) {
         for (StepListener stepListener : getAllListeners()) {
             stepListener.exampleStarted(data, exampleName);
+        }
+    }
+
+    public void exampleStarted(Map<String, String> data, String exampleName, ZonedDateTime time) {
+        for (StepListener stepListener : getAllListeners()) {
+            stepListener.exampleStarted(data, exampleName, time);
         }
     }
 
@@ -926,7 +986,7 @@ public class StepEventBus {
         if (this.isDryRun.isPresent()) {
             return this.isDryRun.get();
         } else {
-            return ThucydidesSystemProperty.THUCYDIDES_DRY_RUN.booleanFrom(environmentVariables);
+            return ThucydidesSystemProperty.SERENITY_DRY_RUN.booleanFrom(environmentVariables);
         }
     }
 
@@ -1060,7 +1120,7 @@ public class StepEventBus {
 
 
     public void wrapUpCurrentCucumberStep() {
-        if (CurrentTestResult.isCucumber(getBaseStepListener().getCurrentTestOutcome()) && getBaseStepListener().currentStepDepth() == 1) {
+        if (isBaseStepListenerRegistered() && CurrentTestResult.isCucumber(getBaseStepListener().getCurrentTestOutcome()) && getBaseStepListener().currentStepDepth() == 1) {
             getBaseStepListener().currentStepDone(TestResult.UNDEFINED);
         }
     }
@@ -1133,6 +1193,18 @@ public class StepEventBus {
             List<ScreenshotAndHtmlSource> screenshots = new ArrayList<>();
             for (StepListener stepListener : getAllListeners()) {
                 stepListener.takeScreenshots(screenshots);
+            }
+            return screenshots;
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    public List<ScreenshotAndHtmlSource> takeScreenshots(TestResult testResult) {
+        if (!isDryRun()) {
+            List<ScreenshotAndHtmlSource> screenshots = new ArrayList<>();
+            for (StepListener stepListener : getAllListeners()) {
+                stepListener.takeScreenshots(testResult, screenshots);
             }
             return screenshots;
         } else {

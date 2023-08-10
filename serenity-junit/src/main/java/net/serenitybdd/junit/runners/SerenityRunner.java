@@ -1,6 +1,5 @@
 package net.serenitybdd.junit.runners;
 
-import com.google.inject.Injector;
 import net.serenitybdd.core.Serenity;
 import net.serenitybdd.core.annotations.environment.AnnotatedEnvironmentProperties;
 import net.serenitybdd.core.environment.WebDriverConfiguredEnvironment;
@@ -10,21 +9,19 @@ import net.thucydides.core.annotations.ManagedWebDriverAnnotatedField;
 import net.thucydides.core.annotations.ManualTestMarkedAsError;
 import net.thucydides.core.annotations.ManualTestMarkedAsFailure;
 import net.thucydides.core.annotations.TestCaseAnnotations;
-import net.thucydides.core.batches.BatchManager;
-import net.thucydides.core.batches.BatchManagerProvider;
-import net.thucydides.core.guice.Injectors;
-import net.thucydides.core.guice.webdriver.WebDriverModule;
-import net.thucydides.core.model.TestOutcome;
+import net.thucydides.model.batches.BatchManager;
+import net.serenitybdd.core.di.SerenityInfrastructure;
+import net.thucydides.model.domain.TestOutcome;
 import net.thucydides.core.pages.Pages;
-import net.thucydides.core.reports.AcceptanceTestReporter;
-import net.thucydides.core.reports.ReportService;
+import net.thucydides.model.reports.AcceptanceTestReporter;
+import net.thucydides.model.reports.ReportService;
 import net.thucydides.core.steps.PageObjectDependencyInjector;
 import net.thucydides.core.steps.StepAnnotations;
 import net.thucydides.core.steps.StepEventBus;
 import net.thucydides.core.steps.StepFactory;
 import net.thucydides.core.steps.stepdata.StepData;
-import net.thucydides.core.tags.TagScanner;
-import net.thucydides.core.tags.Taggable;
+import net.thucydides.model.tags.TagScanner;
+import net.thucydides.model.tags.Taggable;
 import net.thucydides.core.webdriver.*;
 import net.thucydides.junit.listeners.JUnitStepListener;
 import org.junit.runner.Description;
@@ -45,8 +42,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static net.thucydides.core.ThucydidesSystemProperty.TEST_RETRY_COUNT;
-import static net.thucydides.core.model.TestResult.FAILURE;
+import static net.thucydides.model.ThucydidesSystemProperty.TEST_RETRY_COUNT;
+import static net.thucydides.model.domain.TestResult.FAILURE;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
@@ -60,7 +57,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  */
 public class SerenityRunner extends BlockJUnit4ClassRunner implements Taggable {
 
-    private ThreadLocal<Pages> pages = new ThreadLocal<>();
+    private final ThreadLocal<Pages> pages = new ThreadLocal<>();
     private final WebdriverManager webdriverManager;
     private String requestedDriver;
     private ReportService reportService;
@@ -90,34 +87,12 @@ public class SerenityRunner extends BlockJUnit4ClassRunner implements Taggable {
         return pages.get();
     }
 
-    /**
-     * Creates a new test runner for WebDriver web tests.
-     *
-     * @param klass the class under test
-     * @throws InitializationError if some JUnit-related initialization problem occurred
-     */
     public SerenityRunner(final Class<?> klass) throws InitializationError {
-        this(klass, Injectors.getInjector(new WebDriverModule()));
-    }
-
-    /**
-     * Creates a new test runner for WebDriver web tests.
-     *
-     * @param klass the class under test
-     * @param module used to inject a custom Guice module
-     * @throws InitializationError if some JUnit-related initialization problem occurred
-     */
-    public SerenityRunner(Class<?> klass, com.google.inject.Module module) throws InitializationError {
-        this(klass, Injectors.getInjector(module));
-    }
-
-    public SerenityRunner(final Class<?> klass,
-                          final Injector injector) throws InitializationError {
 
         this(klass,
                 ThucydidesWebDriverSupport.getWebdriverManager(),
-                injector.getInstance(DriverConfiguration.class),
-                injector.getInstance(BatchManager.class)
+                SerenityInfrastructure.getDriverConfiguration(),
+                SerenityInfrastructure.getBatchManager()
         );
     }
 
@@ -132,7 +107,7 @@ public class SerenityRunner extends BlockJUnit4ClassRunner implements Taggable {
         this(klass,
                 webDriverFactory,
                 configuration,
-                new BatchManagerProvider(configuration).get()
+                SerenityInfrastructure.getBatchManager()
         );
     }
 
@@ -166,7 +141,7 @@ public class SerenityRunner extends BlockJUnit4ClassRunner implements Taggable {
         this.requestedDriver = getSpecifiedDriver(klass);
         this.tagScanner = new TagScanner(configuration.getEnvironmentVariables());
         this.failureDetectingStepListener = new FailureDetectingStepListener();
-        this.failureRerunner = new FailureRerunnerXml(configuration);
+        this.failureRerunner = new FailureRerunnerJson(configuration);
 
         if (TestCaseAnnotations.supportsWebTests(klass)) {
             checkRequestedDriverType();
@@ -277,7 +252,6 @@ public class SerenityRunner extends BlockJUnit4ClassRunner implements Taggable {
 
     private void fireNotificationsBasedOnTestResultsTo(RunNotifier notifier) {
         if (!latestOutcome().isPresent()) {
-            return;
         }
     }
 

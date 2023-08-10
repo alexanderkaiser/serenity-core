@@ -1,9 +1,11 @@
 package net.thucydides.core.steps;
 
-import net.thucydides.core.annotations.Pending;
-import net.thucydides.core.annotations.Story;
-import net.thucydides.core.model.TestOutcome;
-import net.thucydides.core.model.TestResult;
+import net.serenitybdd.annotations.Pending;
+import net.serenitybdd.annotations.Story;
+import net.thucydides.model.domain.TestOutcome;
+import net.thucydides.model.domain.TestResult;
+import net.thucydides.model.steps.ExecutedStepDescription;
+import net.thucydides.model.steps.StepFailure;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -38,7 +40,7 @@ public class WhenTallyingTestStepResults {
     File outputDirectory;
 
     class ClassUnderTest {
-        public void someTest(){};
+        public void someTest(){}
     }
 
     @Before
@@ -144,7 +146,7 @@ public class WhenTallyingTestStepResults {
         BaseStepListener stepListener = new BaseStepListener(FirefoxDriver.class, outputDirectory);
         stepListener.testSuiteStarted(MyStory.class);
         stepListener.testStarted("app_should_work");
-        assertThat(stepListener.getCurrentTestOutcome().getUserStory().getName(), is("My story"));
+        assertThat(stepListener.getCurrentTestOutcome().getUserStory().getName(), is("MyStory"));
     }
 
     @Test
@@ -178,21 +180,21 @@ public class WhenTallyingTestStepResults {
         BaseStepListener stepListener = new BaseStepListener(FirefoxDriver.class, outputDirectory);
         stepListener.testSuiteStarted(MyStory.class);
         stepListener.testStarted("the app should work");
-        assertThat(stepListener.getCurrentTestOutcome().getUserStory().getName(), is("My story"));
+        assertThat(stepListener.getCurrentTestOutcome().getUserStory().getName(), is("MyStory"));
     }
 
     @Test
     public void a_test_suite_can_be_started_directly_using_a_story_instance_without_a_test_class() {
         BaseStepListener stepListener = new BaseStepListener(FirefoxDriver.class, outputDirectory);
-        net.thucydides.core.model.Story story = net.thucydides.core.model.Story.from(MyStory.class);
+        net.thucydides.model.domain.Story story = net.thucydides.model.domain.Story.from(MyStory.class);
         stepListener.testSuiteStarted(story);
         stepListener.testStarted("the app should work");
-        assertThat(stepListener.getCurrentTestOutcome().getUserStory().getName(), is("My story"));
+        assertThat(stepListener.getCurrentTestOutcome().getUserStory().getName(), is("MyStory"));
     }
 
     @Test
     public void we_can_check_if_a_test_suite_is_currently_running() {
-        net.thucydides.core.model.Story story = net.thucydides.core.model.Story.from(MyStory.class);
+        net.thucydides.model.domain.Story story = net.thucydides.model.domain.Story.from(MyStory.class);
         BaseStepListener stepListener = new BaseStepListener(FirefoxDriver.class, outputDirectory);
 
         assertThat(stepListener.testSuiteRunning(), is(false));
@@ -208,10 +210,10 @@ public class WhenTallyingTestStepResults {
     public void a_test_can_be_started_using_a_story_instance_without_a_test_class() {
 
         BaseStepListener stepListener = new BaseStepListener(FirefoxDriver.class, outputDirectory);
-        net.thucydides.core.model.Story story = net.thucydides.core.model.Story.from(MyStory.class);
+        net.thucydides.model.domain.Story story = net.thucydides.model.domain.Story.from(MyStory.class);
         stepListener.testSuiteStarted(story);
         stepListener.testStarted("the app should work");
-        assertThat(stepListener.getCurrentTestOutcome().getUserStory().getName(), is("My story"));
+        assertThat(stepListener.getCurrentTestOutcome().getUserStory().getName(), is("MyStory"));
     }
 
 
@@ -219,7 +221,7 @@ public class WhenTallyingTestStepResults {
     public void should_be_able_to_update_a_step_title_if_it_is_not_known_initially() {
 
         BaseStepListener stepListener = new BaseStepListener(FirefoxDriver.class, outputDirectory);
-        net.thucydides.core.model.Story story = net.thucydides.core.model.Story.from(MyStory.class);
+        net.thucydides.model.domain.Story story = net.thucydides.model.domain.Story.from(MyStory.class);
         stepListener.testSuiteStarted(story);
         stepListener.testStarted("the app should work");
         stepListener.stepStarted(ExecutedStepDescription.withTitle("provisory title"));
@@ -231,7 +233,7 @@ public class WhenTallyingTestStepResults {
     public void should_be_able_to_create_a_new_step_when_defining_the_title_if_no_step_exists() {
 
         BaseStepListener stepListener = new BaseStepListener(FirefoxDriver.class, outputDirectory);
-        net.thucydides.core.model.Story story = net.thucydides.core.model.Story.from(MyStory.class);
+        net.thucydides.model.domain.Story story = net.thucydides.model.domain.Story.from(MyStory.class);
         stepListener.testSuiteStarted(story);
         stepListener.testStarted("the app should work");
         stepListener.updateCurrentStepTitle("final title");

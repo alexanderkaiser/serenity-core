@@ -1,14 +1,17 @@
 package net.serenitybdd.screenplay;
 
-import net.thucydides.core.model.stacktrace.FailureCause;
-import net.thucydides.core.steps.ExecutedStepDescription;
+import net.thucydides.model.domain.TestResult;
+import net.thucydides.model.domain.stacktrace.FailureCause;
+import net.thucydides.model.screenshots.ScreenshotAndHtmlSource;
+import net.thucydides.model.steps.ExecutedStepDescription;
 import net.thucydides.core.steps.StepEventBus;
-import net.thucydides.core.steps.StepFailure;
+import net.thucydides.model.steps.StepFailure;
 import net.thucydides.core.steps.events.*;
 import net.thucydides.core.steps.session.TestSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -34,7 +37,8 @@ public class EventBusInterface {
         if (!TestSession.isSessionStarted()) {
             StepEventBus.getParallelEventBus().stepFailed(new StepFailure(taskDescription, e));
         }  else {
-            TestSession.addEvent(new StepFailedEvent(new StepFailure(taskDescription, e)));
+            List<ScreenshotAndHtmlSource> screenshotList = TestSession.getTestSessionContext().getStepEventBus().takeScreenshots(TestResult.FAILURE);
+            TestSession.addEvent(new StepFailedEvent(new StepFailure(taskDescription, e),screenshotList));
         }
     }
 
@@ -43,7 +47,8 @@ public class EventBusInterface {
         if (!TestSession.isSessionStarted()) {
             StepEventBus.getParallelEventBus().stepFailed(new StepFailure(consequenceDescription, e));
         }  else {
-            TestSession.addEvent(new StepFailedEvent(new StepFailure(consequenceDescription, e)));
+             List<ScreenshotAndHtmlSource> screenshotList = TestSession.getTestSessionContext().getStepEventBus().takeScreenshots(TestResult.FAILURE);
+            TestSession.addEvent(new StepFailedEvent(new StepFailure(consequenceDescription, e ), screenshotList));
         }
     }
 
